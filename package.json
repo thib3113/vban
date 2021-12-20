@@ -1,0 +1,34 @@
+{
+  "name": "vban",
+  "version": "0.0.1",
+  "description": "Node VBAN implementation",
+  "main": "src/client.ts",
+  "devDependencies": {
+    "@tsconfig/node14": "^1.0.1",
+    "@types/node": "16.11.10",
+    "@typescript-eslint/eslint-plugin": "5.4.0",
+    "@typescript-eslint/parser": "5.4.0",
+    "dotenv": "10.0.0",
+    "eslint": "8.3.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-tsdoc": "0.2.14",
+    "prettier": "2.5.0",
+    "source-map-support": "0.5.21",
+    "ts-node": "10.4.0",
+    "typescript": "4.5.2"
+  },
+  "scripts": {
+    "debug": "tsc && node -r source-map-support/register ./build/client.js",
+    "start": "node src/client.ts",
+    "build": "yarn public && tsc -p tsconfig.json",
+    "build:prod": "yarn public && tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build:prod",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jacob Bower",
+  "license": "ISC",
+  "dependencies": {
+    "speaker": "^0.5.3"
+  }
+}

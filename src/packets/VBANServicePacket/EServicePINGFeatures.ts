@@ -1,0 +1,9 @@
+export enum EServicePINGFeatures {
+    AUDIO = 0x00000001,
+    AOIP = 0x00000002,
+    VOIP = 0x00000004,
+    SERIAL = 0x00000100,
+    MIDI = 0x00000300,
+    FRAME = 0x00001000,
+    TXT = 0x00010000
+}
