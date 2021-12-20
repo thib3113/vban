@@ -170,7 +170,6 @@ jest.config.js
 tsconfig.json
 tsconfig.build.json
 renovate.json
-unifi-storage
 examples/
 
 badwords.json

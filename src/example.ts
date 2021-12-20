@@ -5,7 +5,6 @@ import { VBANAudioPacket } from './packets/VBANAudioPacket/VBANAudioPacket';
 import { VBANServicePacket } from './packets/VBANServicePacket/VBANServicePacket';
 import { VBANSerialPacket } from './packets/VBANSerialPacket/VBANSerialPacket';
 import { EFormatBit } from './commons';
-import { VBANTEXTPacket } from './packets/VBANTXTPacket/VBANTEXTPacket';
 import { VBANPacket } from './packets';
 import { ESerialStreamType } from './packets/VBANSerialPacket/ESerialStreamType';
 
