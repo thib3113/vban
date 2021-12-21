@@ -1,10 +1,11 @@
 import { EServicePINGApplicationType } from './EServicePINGApplicationType';
+import { EServicePINGFeatures } from './EServicePINGFeatures';
 
 export interface IServicePing {
     /* VBAN device type*/
     applicationType: EServicePINGApplicationType;
-    /* VBAN bit feature */
-    bitFeature: number;
+    /* VBAN features */
+    features: Array<EServicePINGFeatures>;
     /* VBAN extra bit feature */
     bitFeatureEx: number;
     /* VBAN Preferred sample rate */

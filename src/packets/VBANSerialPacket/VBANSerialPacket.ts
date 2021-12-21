@@ -1,10 +1,10 @@
 import { VBANPacket } from '../VBANPacket';
-import Buffer from 'buffer';
 import { ESubProtocol } from '../ESubProtocol';
-import { BITS_SPEEDS, EFormatBit } from '../../commons';
+import { BITS_SPEEDS, EFormatBit, serialStopModes } from '../../commons';
 import { ISerialBitMode } from './ISerialBitMode';
 import { ESerialStreamType } from './ESerialStreamType';
 import { IVBANHeaderTXT } from './IVBANHeaderTXT';
+import { Buffer } from 'buffer';
 
 export class VBANSerialPacket extends VBANPacket {
     public subProtocol: ESubProtocol = ESubProtocol.SERIAL;
@@ -28,6 +28,41 @@ export class VBANSerialPacket extends VBANPacket {
         this.data = data;
     }
 
+    public static toUDPPacket(packet: VBANSerialPacket): Buffer {
+        let part1 = 0;
+
+        const mode = serialStopModes.find((m) => m.stop === packet.bitMode.stop)?.mode;
+        if (mode === undefined) {
+            throw new Error(`fail to found mode for stop ${packet.bitMode.stop}`);
+        }
+        part1 |= mode & 0b00000011;
+
+        if (packet.bitMode.start) {
+            part1 |= 0b00000100;
+        }
+
+        if (packet.bitMode.parity) {
+            part1 |= 0b00001000;
+        }
+
+        if (packet.bitMode.multipart) {
+            part1 |= 0b10000000;
+        }
+
+        return this.convertToUDPPacket(
+            {
+                streamName: packet.streamName,
+                sp: packet.subProtocol,
+                sr: packet.sr,
+                frameCounter: packet.frameCounter,
+                part1,
+                part2: packet.channelsIdents,
+                part3: (packet.formatBit & 0b00000111) | (packet.streamType & 0b11110000)
+            },
+            packet.data
+        );
+    }
+
     public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANSerialPacket {
         const headers = this.prepareFromUDPPacket(headersBuffer);
 
@@ -40,21 +75,8 @@ export class VBANSerialPacket extends VBANPacket {
         const bitModeRaw = headers.part1;
 
         const stopMode = bitModeRaw & 0b00000011;
-        let stop: number | null;
-        switch (stopMode) {
-            case 0:
-                stop = 1;
-                break;
-            case 1:
-                stop = 1.5;
-                break;
-            case 2:
-                stop = 2;
-                break;
-            case 3:
-            default:
-                stop = null;
-        }
+
+        const stop = serialStopModes.find((m) => m.mode === stopMode)?.stop ?? null;
 
         const start = (bitModeRaw & 0b00000100) === 4;
         const parity = (bitModeRaw & 0b00001000) === 8;

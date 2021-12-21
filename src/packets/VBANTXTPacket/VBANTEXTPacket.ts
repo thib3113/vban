@@ -1,5 +1,5 @@
 import { VBANPacket } from '../VBANPacket';
-import Buffer from 'buffer';
+import { Buffer } from 'buffer';
 import { ESubProtocol } from '../ESubProtocol';
 import { BITS_SPEEDS, EFormatBit } from '../../commons';
 import { ETextStreamType } from './ETextStreamType';

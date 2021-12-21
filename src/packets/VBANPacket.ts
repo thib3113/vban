@@ -1,8 +1,9 @@
-import Buffer from 'buffer';
 import { ESubProtocol } from './ESubProtocol';
 import { IVbanHeaderCommon } from './IVbanHeaderCommon';
-import { PACKET_IDENTIFICATION } from '../commons';
+import { cleanPacketString, PACKET_IDENTIFICATION } from '../commons';
 import { IVBANHeader } from './IVBANHeader';
+import { VBAN_DATA_MAX_SIZE } from './VBANSpecs';
+import { Buffer } from 'buffer';
 
 //sample rates
 export const sampleRates: Record<number, number | null> = {
@@ -49,7 +50,7 @@ export class VBANPacket {
 
     public static frameCounters: Map<string, number> = new Map<string, number>();
 
-    public static splitHeaders(headersBuffer: Buffer): IVbanHeaderCommon {
+    public static prepareFromUDPPacket(headersBuffer: Buffer): IVbanHeaderCommon {
         const headers: Partial<IVbanHeaderCommon> = {};
 
         // SR / Sub protocol (5 + 3 bits)
@@ -72,10 +73,10 @@ export class VBANPacket {
         headers.part3 = headersBuffer.readUInt8(7);
 
         // Stream Name (16 bytes)
-        headers.streamName = headersBuffer.toString('ascii', 8, 22);
+        headers.streamName = cleanPacketString(headersBuffer.toString('ascii', 8, 24));
 
         // Frame Counter (32 bits)
-        headers.frameCounter = headersBuffer.readUInt32LE(21);
+        headers.frameCounter = headersBuffer.readUInt32LE(24);
 
         return headers as IVbanHeaderCommon;
     }
@@ -87,8 +88,32 @@ export class VBANPacket {
         this.frameCounter = headers.frameCounter;
     }
 
-    protected static prepareFromUDPPacket(headersBuffer: Buffer) {
-        return VBANPacket.splitHeaders(headersBuffer);
+    protected static convertToUDPPacket(headers: Omit<IVbanHeaderCommon, 'rawSampleRate'>, data: Buffer): Buffer {
+        let bufferStart = 0;
+
+        const headersBuffer = Buffer.alloc(28);
+
+        bufferStart += PACKET_IDENTIFICATION.length;
+        headersBuffer.fill(PACKET_IDENTIFICATION, bufferStart - PACKET_IDENTIFICATION.length, bufferStart, 'ascii');
+
+        //search sampleRate
+        const rate = Object.entries(sampleRates).find(([, sr]) => sr && sr === headers.sr);
+        if (!rate) {
+            throw new Error(`fail to find index for sample rate ${headers.sr}`);
+        }
+
+        headersBuffer.fill((Number(rate[0]) & 0b00011111) | (headers.sp & 0b11100000), bufferStart++);
+
+        headersBuffer.fill(headers.part1, bufferStart++);
+        headersBuffer.fill(headers.part2, bufferStart++);
+        headersBuffer.fill(headers.part3, bufferStart++);
+
+        headersBuffer.fill(headers.streamName.padEnd(16, '\0'), bufferStart, bufferStart + 16, 'ascii');
+        bufferStart += 16;
+
+        headersBuffer.writeInt32LE(headers.frameCounter, bufferStart);
+
+        return Buffer.concat([headersBuffer, data.slice(0, VBAN_DATA_MAX_SIZE)]);
     }
 
     public static checkFrameCounter(headers: VBANPacket) {
@@ -104,6 +129,8 @@ export class VBANPacket {
             console.log('frameCounter error');
         } else if (frameCounter && headers.frameCounter > 0) {
             console.log('frame counter', 'old', frameCounter, 'new', headers.frameCounter, 'diff', headers.frameCounter - frameCounter);
+        } else if (headers.frameCounter === 0) {
+            console.log('frame 0');
         }
 
         this.frameCounters.set(frameCounterKey, headers.frameCounter);

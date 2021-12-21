@@ -41,3 +41,34 @@ export enum EFormatBit {
      */
     VBAN_DATATYPE_BYTE8 = 0x00
 }
+
+export const serialStopModes: Array<{ mode: number; stop: number | null }> = [
+    {
+        mode: 0,
+        stop: 1
+    },
+    {
+        mode: 1,
+        stop: 1.5
+    },
+    {
+        mode: 2,
+        stop: 2
+    },
+    {
+        mode: 3,
+        stop: null
+    }
+];
+
+export function dec2bin(dec: number) {
+    return ((dec >>> 0).toString(2) || '').padStart(8, '0');
+}
+
+export function prepareStringForPacket(str: string, maxLength: number): string {
+    return str.slice(0, maxLength).padEnd(maxLength, '\0');
+}
+
+export function cleanPacketString(str: string): string {
+    return str.replace(/\0/g, '');
+}

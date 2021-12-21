@@ -1,9 +1,9 @@
 import { VBANPacket } from '../VBANPacket';
-import Buffer from 'buffer';
 import { ESubProtocol } from '../ESubProtocol';
 import { EBitsResolutions } from './EBitsResolutions';
 import { ECodecs } from './ECodecs';
 import { IVBANHeaderAudio } from './IVBANHeaderAudio';
+import { Buffer } from 'buffer';
 
 export class VBANAudioPacket extends VBANPacket {
     public subProtocol: ESubProtocol = ESubProtocol.AUDIO;
@@ -25,6 +25,21 @@ export class VBANAudioPacket extends VBANPacket {
         this.data = data;
     }
 
+    public static toUDPPacket(packet: VBANAudioPacket): Buffer {
+        return this.convertToUDPPacket(
+            {
+                streamName: packet.streamName,
+                sp: packet.subProtocol,
+                sr: packet.sr,
+                frameCounter: packet.frameCounter,
+                part1: packet.nbSample - 1,
+                part2: packet.nbChannel - 1,
+                part3: (packet.bitResolution & 0b0000111) | (packet.codec & 0b11110000)
+            },
+            packet.data
+        );
+    }
+
     public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANAudioPacket {
         const headers = this.prepareFromUDPPacket(headersBuffer);
         const nbSample = headers.part1 + 1;
@@ -33,13 +48,13 @@ export class VBANAudioPacket extends VBANPacket {
         // Data Format / Codec (3 + 1 + 4 bits)
         const dataFormatAndCodec = headers.part3;
 
-        const bitResolution = dataFormatAndCodec & 3;
+        const bitResolution = dataFormatAndCodec & 0b0000111;
         if (!EBitsResolutions[bitResolution]) {
             throw new Error(`unknown bit resolution ${bitResolution}`);
         }
 
         // Ignore 1 bit
-        const codec = (dataFormatAndCodec >> 4) << 4; // 4 bits
+        const codec = dataFormatAndCodec & 0b11110000;
         if (!ECodecs[codec]) {
             throw new Error(`unknown codec ${codec}`);
         }

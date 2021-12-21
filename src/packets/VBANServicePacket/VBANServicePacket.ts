@@ -1,20 +1,24 @@
 import { VBANPacket } from '../VBANPacket';
-import Buffer from 'buffer';
 import { ESubProtocol } from '../ESubProtocol';
 import { EServicePINGApplicationType } from './EServicePINGApplicationType';
-import { EServicePINGFeatures } from './EServicePINGFeatures';
 import { EServiceType } from './EServiceType';
 import { IServicePing } from './IServicePing';
 import { IVBANHeader } from '../IVBANHeader';
+import { Buffer } from 'buffer';
+import { cleanPacketString, prepareStringForPacket } from '../../commons';
+import { EServicePINGFeatures } from './EServicePINGFeatures';
 
 export interface IVBANHeaderService extends IVBANHeader {
     service: EServiceType;
+    /**
+     * can be 0 for PING0, or 0x80 for REPLY
+     */
     serviceFunction: number;
     isReply: boolean;
 }
 
 export class VBANServicePacket extends VBANPacket {
-    public subProtocol: ESubProtocol = ESubProtocol.AUDIO;
+    public subProtocol: ESubProtocol = ESubProtocol.SERVICE;
     public service: EServiceType;
     public serviceFunction: number;
     public isReply: boolean;
@@ -34,8 +38,6 @@ export class VBANServicePacket extends VBANPacket {
     public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANServicePacket {
         const headers = this.prepareFromUDPPacket(headersBuffer);
 
-        const sr = 0;
-
         const fn = headers.part1;
         const serviceFunction = fn & 0b01111111;
         const isReply = (fn & 0b10000000) === 1;
@@ -54,9 +56,9 @@ export class VBANServicePacket extends VBANPacket {
         const bitType = getXNextBytes(4).readUInt32LE();
         const applicationType = EServicePINGApplicationType[bitType] ? bitType : EServicePINGApplicationType.UNKNOWN;
         const bitFeature = getXNextBytes(4).readUInt32LE();
-        // const features = (Object.entries(EServicePINGFeatures).filter(([k]) => isNaN(Number(k))) as Array<[string, EServicePINGFeatures]>)
-        //     .filter(([, v]) => bitFeature & v)
-        //     .map(([k]) => k);
+        const features = (Object.entries(EServicePINGFeatures).filter(([k]) => isNaN(Number(k))) as Array<[string, EServicePINGFeatures]>)
+            .filter(([, v]) => bitFeature & v)
+            .map(([, v]) => v);
         const bitFeatureEx = getXNextBytes(4).readUInt32LE();
         const PreferredRate = getXNextBytes(4).readUInt32LE();
         const minRate = getXNextBytes(4).readUInt32LE();
@@ -68,23 +70,23 @@ export class VBANServicePacket extends VBANPacket {
             red: (colorRGB >> 16) & 255
         };
         const nVersion = getXNextBytes(4).readUInt32LE();
-        const GPSPosition = getXNextBytes(8).toString('ascii');
-        const userPosition = getXNextBytes(8).toString('ascii');
-        const LangCode = getXNextBytes(8).toString('ascii');
-        const reservedASCII = getXNextBytes(8).toString('ascii');
-        const reservedEx = getXNextBytes(64).toString('ascii');
-        const reservedEx2 = getXNextBytes(36).toString('ascii');
-        const deviceName = getXNextBytes(64).toString('ascii');
-        const manufacturerName = getXNextBytes(64).toString('ascii');
-        const applicationName = getXNextBytes(64).toString('ascii');
-        const reservedLongASCII = getXNextBytes(64).toString('ascii');
-        const userName = getXNextBytes(128).toString('utf8');
-        const userComment = getXNextBytes(128).toString('utf8');
+        const GPSPosition = cleanPacketString(getXNextBytes(8).toString('ascii'));
+        const userPosition = cleanPacketString(getXNextBytes(8).toString('ascii'));
+        const LangCode = cleanPacketString(getXNextBytes(8).toString('ascii'));
+        const reservedASCII = cleanPacketString(getXNextBytes(8).toString('ascii'));
+        const reservedEx = cleanPacketString(getXNextBytes(64).toString('ascii'));
+        const reservedEx2 = cleanPacketString(getXNextBytes(36).toString('ascii'));
+        const deviceName = cleanPacketString(getXNextBytes(64).toString('ascii'));
+        const manufacturerName = cleanPacketString(getXNextBytes(64).toString('ascii'));
+        const applicationName = cleanPacketString(getXNextBytes(64).toString('ascii'));
+        const reservedLongASCII = cleanPacketString(getXNextBytes(64).toString('ascii'));
+        const userName = cleanPacketString(getXNextBytes(128).toString('utf8'));
+        const userComment = cleanPacketString(getXNextBytes(128).toString('utf8'));
 
         //extract information
         const data = {
             applicationType,
-            bitFeature,
+            features,
             bitFeatureEx,
             PreferredRate,
             minRate,
@@ -113,6 +115,56 @@ export class VBANServicePacket extends VBANPacket {
                 isReply
             },
             data
+        );
+    }
+
+    public static toUDPPacket(packet: VBANServicePacket): Buffer {
+        // 704 is the size for a service packet
+        const dataBuffer = Buffer.alloc(676);
+        let offset = 0;
+
+        offset = dataBuffer.writeUInt32LE(packet.data.applicationType, offset);
+        let features = 0;
+        packet.data.features.forEach((feature) => {
+            if (EServicePINGFeatures[feature]) {
+                features = features | feature;
+            }
+        });
+        offset = dataBuffer.writeUInt32LE(features, offset);
+        offset = dataBuffer.writeUInt32LE(packet.data.bitFeatureEx, offset);
+        offset = dataBuffer.writeUInt32LE(packet.data.PreferredRate, offset);
+        offset = dataBuffer.writeUInt32LE(packet.data.minRate, offset);
+        offset = dataBuffer.writeUInt32LE(packet.data.maxRate, offset);
+
+        const { red, green, blue } = packet.data.color;
+        offset = dataBuffer.writeUInt32LE(((red & 255) << 16) | ((green & 255) << 8) | (blue & 255), offset);
+
+        offset = dataBuffer.writeUInt32LE(packet.data.nVersion, offset);
+
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.GPSPosition, 8), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.userPosition, 8), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.LangCode, 8), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.reservedASCII, 8), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.reservedEx, 64), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.reservedEx2, 36), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.deviceName, 64), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.manufacturerName, 64), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.applicationName, 64), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.reservedLongASCII, 64), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.userName, 128), offset, 'utf8');
+        dataBuffer.write(prepareStringForPacket(packet.data.userComment, 128), offset, 'utf8');
+
+        return this.convertToUDPPacket(
+            {
+                streamName: packet.streamName,
+                sp: packet.subProtocol,
+                sr: packet.sr,
+                frameCounter: packet.frameCounter,
+                part1: ((packet.isReply ? 0b10000000 : 0) & 0b10000000) | (packet.serviceFunction & 0b01111111),
+                part2: packet.service,
+                part3: 0
+            },
+            dataBuffer
         );
     }
 }

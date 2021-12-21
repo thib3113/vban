@@ -1,4 +1,4 @@
-import Buffer from 'buffer';
+import { Buffer } from 'buffer';
 import { PACKET_IDENTIFICATION } from './commons';
 import { ESubProtocol, VBANAudioPacket, VBANSerialPacket, VBANServicePacket, VBANTEXTPacket } from './packets';
 
