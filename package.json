@@ -1,6 +1,6 @@
 {
   "name": "vban",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Node VBAN implementation",
   "main": "lib/index.js",
   "devDependencies": {
