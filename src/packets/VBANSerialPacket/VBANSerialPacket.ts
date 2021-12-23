@@ -66,11 +66,11 @@ export class VBANSerialPacket extends VBANPacket {
     public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANSerialPacket {
         const headers = this.prepareFromUDPPacket(headersBuffer);
 
-        if (!BITS_SPEEDS[headers.rawSampleRate]) {
-            throw new Error(`unknown bits speed ${headers.rawSampleRate}`);
+        if (!headers.srIndex || !BITS_SPEEDS[headers.srIndex]) {
+            throw new Error(`unknown bits speed ${headers.srIndex}`);
         }
 
-        const bps = BITS_SPEEDS[headers.rawSampleRate] as number;
+        const bps = BITS_SPEEDS[headers.srIndex] as number;
 
         const bitModeRaw = headers.part1;
 

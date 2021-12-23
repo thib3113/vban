@@ -164,7 +164,8 @@ export class VBANServicePacket extends VBANPacket {
                 part2: packet.service,
                 part3: 0
             },
-            dataBuffer
+            dataBuffer,
+            packet.sr
         );
     }
 }

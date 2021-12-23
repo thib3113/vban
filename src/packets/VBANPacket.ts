@@ -62,7 +62,7 @@ export class VBANPacket {
             throw new Error(`unknown sample rate ${srIndex}`);
         }
         headers.sr = sampleRates[srIndex] as number;
-        headers.rawSampleRate = srIndex;
+        headers.srIndex = srIndex;
 
         // Samples per frame (8 bits)
         headers.part1 = headersBuffer.readUInt8(5);
@@ -88,7 +88,7 @@ export class VBANPacket {
         this.frameCounter = headers.frameCounter;
     }
 
-    protected static convertToUDPPacket(headers: Omit<IVbanHeaderCommon, 'rawSampleRate'>, data: Buffer): Buffer {
+    protected static convertToUDPPacket(headers: Omit<IVbanHeaderCommon, 'srIndex'>, data: Buffer, sampleRate?: number): Buffer {
         let bufferStart = 0;
 
         const headersBuffer = Buffer.alloc(28);
@@ -96,13 +96,20 @@ export class VBANPacket {
         bufferStart += PACKET_IDENTIFICATION.length;
         headersBuffer.fill(PACKET_IDENTIFICATION, bufferStart - PACKET_IDENTIFICATION.length, bufferStart, 'ascii');
 
-        //search sampleRate
-        const rate = Object.entries(sampleRates).find(([, sr]) => sr && sr === headers.sr);
-        if (!rate) {
-            throw new Error(`fail to find index for sample rate ${headers.sr}`);
+        let rate = sampleRate ?? 0;
+        if (sampleRate === undefined) {
+            //search sampleRate
+            rate = Number(
+                Object.entries(sampleRates)
+                    .find(([, sr]) => sr && sr === headers.sr)
+                    ?.shift()
+            );
+            if (!rate) {
+                throw new Error(`fail to find index for sample rate ${headers.sr}`);
+            }
         }
 
-        headersBuffer.fill((Number(rate[0]) & 0b00011111) | (headers.sp & 0b11100000), bufferStart++);
+        headersBuffer.fill((rate & 0b00011111) | (headers.sp & 0b11100000), bufferStart++);
 
         headersBuffer.fill(headers.part1, bufferStart++);
         headersBuffer.fill(headers.part2, bufferStart++);
