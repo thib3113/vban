@@ -1,6 +1,6 @@
 {
   "name": "vban",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Node VBAN implementation",
   "main": "src/example.ts",
   "devDependencies": {
