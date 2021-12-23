@@ -3,12 +3,12 @@
     "lib": ["es2018", "dom", "esnext"],
     "module": "commonjs",
     "target": "es5",
-    "sourceMap": true,
+    "sourceMap": false,
     "allowJs": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "strictNullChecks": true,
     "declaration": true,
-    "outDir": "build"
+    "outDir": "lib"
   },
   "extends": "@tsconfig/node14/tsconfig.json",
   "exclude": [
