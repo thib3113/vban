@@ -17,5 +17,7 @@ Functionalities in progress :
 This project is inspired by [node-VBAN](https://github.com/JMJBower/node-VBAN) from [Jacob Bower](https://github.com/JMJBower).
 He does the job for audio part, and the example .
 
+And a Big thanks to [VB-Audio](https://www.facebook.com/vbaudiosoftware), for the VBAN protocol
+
 ### Donations
 If you want to do a donations, please do it on the VBAN creator website : https://vb-audio.com/Services/licensing.htm
