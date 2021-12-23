@@ -3,17 +3,11 @@ import { Buffer } from 'buffer';
 import { ESubProtocol } from '../ESubProtocol';
 import { BITS_SPEEDS, EFormatBit } from '../../commons';
 import { ETextStreamType } from './ETextStreamType';
-import { IVBANHeader } from '../IVBANHeader';
-
-interface IVBANHeaderTEXT extends Omit<IVBANHeader, 'sp' | 'sr'> {
-    bps?: number;
-    channelsIdents?: number;
-    formatBit: EFormatBit;
-    streamType: ETextStreamType;
-}
+import { IVBANHeaderTEXT } from './IVBANHeaderTEXT';
 
 export class VBANTEXTPacket extends VBANPacket {
-    public subProtocol: ESubProtocol = ESubProtocol.TEXT;
+    public static subProtocol: ESubProtocol = ESubProtocol.TEXT;
+    public subProtocol: ESubProtocol = VBANTEXTPacket.subProtocol;
     public bps: number;
     public channelsIdents: number;
     public formatBit: EFormatBit;
@@ -27,7 +21,7 @@ export class VBANTEXTPacket extends VBANPacket {
     constructor(headers: IVBANHeaderTEXT, txt: string = '', dataBuffer?: Buffer) {
         super({
             ...headers,
-            sp: ESubProtocol.TEXT,
+            sp: VBANTEXTPacket.subProtocol,
             sr: headers.bps ?? 0
         });
 

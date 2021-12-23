@@ -6,7 +6,8 @@ import { IVBANHeaderAudio } from './IVBANHeaderAudio';
 import { Buffer } from 'buffer';
 
 export class VBANAudioPacket extends VBANPacket {
-    public subProtocol: ESubProtocol = ESubProtocol.AUDIO;
+    public static subProtocol: ESubProtocol = ESubProtocol.AUDIO;
+    public subProtocol: ESubProtocol = VBANAudioPacket.subProtocol;
     public nbSample: number;
     public nbChannel: number;
     public bitResolution: number;
@@ -15,7 +16,10 @@ export class VBANAudioPacket extends VBANPacket {
     public data: Buffer;
 
     constructor(headers: IVBANHeaderAudio, data: Buffer) {
-        super(headers);
+        super({
+            ...headers,
+            sp: VBANAudioPacket.subProtocol
+        });
 
         this.nbSample = headers.nbSample;
         this.nbChannel = headers.nbChannel;

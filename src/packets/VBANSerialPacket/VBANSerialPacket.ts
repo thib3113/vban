@@ -7,7 +7,8 @@ import { IVBANHeaderTXT } from './IVBANHeaderTXT';
 import { Buffer } from 'buffer';
 
 export class VBANSerialPacket extends VBANPacket {
-    public subProtocol: ESubProtocol = ESubProtocol.SERIAL;
+    public static subProtocol: ESubProtocol = ESubProtocol.SERIAL;
+    public subProtocol: ESubProtocol = VBANSerialPacket.subProtocol;
     public bitMode: ISerialBitMode;
     public channelsIdents: number;
     public bps: number;
@@ -17,7 +18,10 @@ export class VBANSerialPacket extends VBANPacket {
     public data: Buffer;
 
     constructor(headers: IVBANHeaderTXT, data: Buffer) {
-        super(headers);
+        super({
+            ...headers,
+            sp: VBANSerialPacket.subProtocol
+        });
 
         this.bitMode = headers.bitMode;
         this.channelsIdents = headers.channelsIdents;

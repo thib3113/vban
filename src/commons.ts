@@ -1,6 +1,6 @@
 export const PACKET_IDENTIFICATION = 'VBAN';
 
-export const BITS_SPEEDS: Record<number, number | null> = {
+export const BITS_SPEEDS: Record<number, number> = {
     0: 0,
     1: 110,
     2: 150,
@@ -26,13 +26,13 @@ export const BITS_SPEEDS: Record<number, number | null> = {
     22: 1500000,
     23: 2000000,
     24: 3000000,
-    25: null,
-    26: null,
-    27: null,
-    28: null,
-    29: null,
-    30: null,
-    31: null
+    25: 0,
+    26: 0,
+    27: 0,
+    28: 0,
+    29: 0,
+    30: 0,
+    31: 0
 };
 
 export enum EFormatBit {
@@ -72,3 +72,39 @@ export function prepareStringForPacket(str: string, maxLength: number): string {
 export function cleanPacketString(str: string): string {
     return str.replace(/\0/g, '');
 }
+
+//sample rates
+export const sampleRates: Record<number, number> = {
+    0: 6000,
+    1: 12000,
+    2: 24000,
+    3: 48000,
+    4: 96000,
+    5: 192000,
+    6: 384000,
+    7: 8000,
+    8: 16000,
+    9: 32000,
+    10: 64000,
+    11: 128000,
+    12: 256000,
+    13: 512000,
+    14: 11025,
+    15: 22050,
+    16: 44100,
+    17: 88200,
+    18: 176400,
+    19: 352800,
+    20: 705600,
+    21: 0,
+    22: 0,
+    23: 0,
+    24: 0,
+    25: 0,
+    26: 0,
+    27: 0,
+    28: 0,
+    29: 0,
+    30: 0,
+    31: 0
+};

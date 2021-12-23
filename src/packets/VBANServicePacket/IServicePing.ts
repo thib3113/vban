@@ -23,7 +23,7 @@ export interface IServicePing {
     /* Device position defined by a user process */
     userPosition: string;
     /* main language used by user */
-    LangCode: string;
+    langCode: string;
     /* unused : must be ZERO*/
     reservedASCII: string;
     /* unused : must be ZERO*/

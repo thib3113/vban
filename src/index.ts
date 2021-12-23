@@ -4,4 +4,4 @@
 export * from './packets';
 
 export * from './commons';
-export { IVbanHeaderCommon } from './packets/IVbanHeaderCommon';
+export * from './VBANProtocol';

@@ -11,6 +11,7 @@ Functionalities in progress :
 - [X] Convert UDP packet to objects
 - [X] Convert Objects to UDP packet
 - [ ] Start a VBAN Server, with configuration, and auto SERVICE replies
+- [ ] Implements RT-Packet Service
 
 ### Thanks to
 This project is inspired by [node-VBAN](https://github.com/JMJBower/node-VBAN) from [Jacob Bower](https://github.com/JMJBower).

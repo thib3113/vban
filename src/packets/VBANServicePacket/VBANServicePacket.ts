@@ -3,34 +3,30 @@ import { ESubProtocol } from '../ESubProtocol';
 import { EServicePINGApplicationType } from './EServicePINGApplicationType';
 import { EServiceType } from './EServiceType';
 import { IServicePing } from './IServicePing';
-import { IVBANHeader } from '../IVBANHeader';
 import { Buffer } from 'buffer';
 import { cleanPacketString, prepareStringForPacket } from '../../commons';
 import { EServicePINGFeatures } from './EServicePINGFeatures';
-
-export interface IVBANHeaderService extends IVBANHeader {
-    service: EServiceType;
-    /**
-     * can be 0 for PING0, or 0x80 for REPLY
-     */
-    serviceFunction: number;
-    isReply: boolean;
-}
+import { IVBANHeaderService } from './IVBANHeaderService';
 
 export class VBANServicePacket extends VBANPacket {
-    public subProtocol: ESubProtocol = ESubProtocol.SERVICE;
+    public static subProtocol: ESubProtocol = ESubProtocol.SERVICE;
+    public subProtocol: ESubProtocol = VBANServicePacket.subProtocol;
     public service: EServiceType;
     public serviceFunction: number;
-    public isReply: boolean;
+    public isReply: boolean = false;
 
     public data: IServicePing;
 
     constructor(headers: IVBANHeaderService, data: IServicePing) {
-        super(headers);
+        super({
+            ...headers,
+            sp: VBANServicePacket.subProtocol,
+            sr: 0
+        });
 
         this.service = headers.service;
         this.serviceFunction = headers.serviceFunction;
-        this.isReply = headers.isReply;
+        this.isReply = headers.isReply ?? false;
 
         this.data = data;
     }
@@ -72,7 +68,7 @@ export class VBANServicePacket extends VBANPacket {
         const nVersion = getXNextBytes(4).readUInt32LE();
         const GPSPosition = cleanPacketString(getXNextBytes(8).toString('ascii'));
         const userPosition = cleanPacketString(getXNextBytes(8).toString('ascii'));
-        const LangCode = cleanPacketString(getXNextBytes(8).toString('ascii'));
+        const langCode = cleanPacketString(getXNextBytes(8).toString('ascii'));
         const reservedASCII = cleanPacketString(getXNextBytes(8).toString('ascii'));
         const reservedEx = cleanPacketString(getXNextBytes(64).toString('ascii'));
         const reservedEx2 = cleanPacketString(getXNextBytes(36).toString('ascii'));
@@ -95,7 +91,7 @@ export class VBANServicePacket extends VBANPacket {
             nVersion,
             GPSPosition,
             userPosition,
-            LangCode,
+            langCode,
             reservedASCII,
             reservedEx,
             reservedEx2,
@@ -143,7 +139,7 @@ export class VBANServicePacket extends VBANPacket {
 
         offset += dataBuffer.write(prepareStringForPacket(packet.data.GPSPosition, 8), offset, 'ascii');
         offset += dataBuffer.write(prepareStringForPacket(packet.data.userPosition, 8), offset, 'ascii');
-        offset += dataBuffer.write(prepareStringForPacket(packet.data.LangCode, 8), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.langCode, 8), offset, 'ascii');
         offset += dataBuffer.write(prepareStringForPacket(packet.data.reservedASCII, 8), offset, 'ascii');
         offset += dataBuffer.write(prepareStringForPacket(packet.data.reservedEx, 64), offset, 'ascii');
         offset += dataBuffer.write(prepareStringForPacket(packet.data.reservedEx2, 36), offset, 'ascii');

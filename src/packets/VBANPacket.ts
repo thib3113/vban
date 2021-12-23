@@ -1,45 +1,9 @@
 import { ESubProtocol } from './ESubProtocol';
 import { IVbanHeaderCommon } from './IVbanHeaderCommon';
-import { cleanPacketString, PACKET_IDENTIFICATION } from '../commons';
+import { cleanPacketString, PACKET_IDENTIFICATION, sampleRates } from '../commons';
 import { IVBANHeader } from './IVBANHeader';
 import { VBAN_DATA_MAX_SIZE } from './VBANSpecs';
 import { Buffer } from 'buffer';
-
-//sample rates
-export const sampleRates: Record<number, number | null> = {
-    0: 6000,
-    1: 12000,
-    2: 24000,
-    3: 48000,
-    4: 96000,
-    5: 192000,
-    6: 384000,
-    7: 8000,
-    8: 16000,
-    9: 32000,
-    10: 64000,
-    11: 128000,
-    12: 256000,
-    13: 512000,
-    14: 11025,
-    15: 22050,
-    16: 44100,
-    17: 88200,
-    18: 176400,
-    19: 352800,
-    20: 705600,
-    21: null,
-    22: null,
-    23: null,
-    24: null,
-    25: null,
-    26: null,
-    27: null,
-    28: null,
-    29: null,
-    30: null,
-    31: null
-};
 
 export class VBANPacket {
     public subProtocol?: ESubProtocol;
@@ -61,7 +25,7 @@ export class VBANPacket {
         if (!sampleRates.hasOwnProperty(srIndex) || !sampleRates[srIndex]) {
             throw new Error(`unknown sample rate ${srIndex}`);
         }
-        headers.sr = sampleRates[srIndex] as number;
+        headers.sr = sampleRates[srIndex];
         headers.srIndex = srIndex;
 
         // Samples per frame (8 bits)
