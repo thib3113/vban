@@ -1,9 +1,9 @@
 # VBAN
-Implementation of the VBAN protocol in node-js
+Implementation of the VBAN protocol in node-js ( rev 9, oct 2021 )
 
 https://www.vb-audio.com/Voicemeeter/VBANProtocol_Specifications.pdf
 
-##Install
+## Install
 ```
 yarn install vban
 ```
@@ -68,6 +68,10 @@ server.bind(7000);
 ```
 
 More Examples in the [examples folder](./examples)
+
+## Documentation
+
+technical documentation is available [here](https://thib3113.github.io/VBAN/)
 
 ## Package Status
 
