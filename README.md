@@ -5,7 +5,7 @@ https://www.vb-audio.com/Voicemeeter/VBANProtocol_Specifications.pdf
 
 ## Install
 ```
-yarn install vban
+npm i vban
 ```
 
 ## Examples
