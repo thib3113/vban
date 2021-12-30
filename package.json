@@ -20,7 +20,7 @@
   },
   "scripts": {
     "debug": "tsc && node -r source-map-support/register ./lib/example.js",
-    "start": "node src/example.ts",
+    "start": "node src/debug.ts",
     "build": "tsc -p tsconfig.json",
     "build:prod": "yarn && tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build:prod",

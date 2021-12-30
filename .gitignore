@@ -162,3 +162,5 @@ yarn.lock
 badwords.json
 
 docs
+
+src/debug.ts
