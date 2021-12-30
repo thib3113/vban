@@ -22,7 +22,7 @@
     "debug": "tsc && node -r source-map-support/register ./lib/example.js",
     "start": "node src/debug.ts",
     "build": "tsc -p tsconfig.json",
-    "build:prod": "yarn && tsc -p tsconfig.build.json",
+    "build:prod": "tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build:prod",
     "ci:generate:documentation": "typedoc",
     "test": "echo \"Error: no test specified\" && exit 1"
