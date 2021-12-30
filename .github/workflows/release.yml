@@ -1,9 +1,7 @@
 name: Release
 on:
-  push:
-    branches: [ main ]
-  # release:
-  #   types: [created]
+  release:
+    types: [created]
 jobs:
 
   prepare:
@@ -56,22 +54,22 @@ jobs:
         env:
           CI: true
 
-  # deploy-npm:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: lts/*
-  #         registry-url: 'https://registry.npmjs.org'
-  #     - run: npm install
-  #       env:
-  #         CI: true
-  #     - run: npm publish --access public
-  #       name: publish on npm
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  deploy-npm:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: lts/*
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install
+        env:
+          CI: true
+      - run: npm publish --access public
+        name: publish on npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   deploy-GPR: 
     runs-on: ubuntu-latest
