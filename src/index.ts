@@ -4,4 +4,7 @@
 export * from './packets';
 
 export * from './commons';
-export * from './VBANProtocol';
+export * from './VBANProtocolFactory';
+
+export * from './IVBANServerOptions';
+export * from './VBANServer';

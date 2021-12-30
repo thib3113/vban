@@ -1,12 +1,12 @@
 import { ESubProtocol } from './ESubProtocol';
-import { IVbanHeaderCommon } from './IVbanHeaderCommon';
+import { IVBANHeaderCommon } from './IVBANHeaderCommon';
 import { cleanPacketString, PACKET_IDENTIFICATION, sampleRates } from '../commons';
 import { IVBANHeader } from './IVBANHeader';
 import { VBAN_DATA_MAX_SIZE } from './VBANSpecs';
 import { Buffer } from 'buffer';
 
 export class VBANPacket {
-    public subProtocol?: ESubProtocol;
+    public subProtocol: ESubProtocol = ESubProtocol.AUDIO;
 
     public streamName: string;
     public sr: number;
@@ -14,8 +14,8 @@ export class VBANPacket {
 
     public static frameCounters: Map<string, number> = new Map<string, number>();
 
-    public static prepareFromUDPPacket(headersBuffer: Buffer): IVbanHeaderCommon {
-        const headers: Partial<IVbanHeaderCommon> = {};
+    public static prepareFromUDPPacket(headersBuffer: Buffer): IVBANHeaderCommon {
+        const headers: Partial<IVBANHeaderCommon> = {};
 
         // SR / Sub protocol (5 + 3 bits)
         const srsp = headersBuffer.readUInt8(PACKET_IDENTIFICATION.length);
@@ -42,17 +42,17 @@ export class VBANPacket {
         // Frame Counter (32 bits)
         headers.frameCounter = headersBuffer.readUInt32LE(24);
 
-        return headers as IVbanHeaderCommon;
+        return headers as IVBANHeaderCommon;
     }
 
     constructor(headers: IVBANHeader) {
         this.sr = headers.sr;
         this.streamName = headers.streamName;
         // Frame Counter (32 bits)
-        this.frameCounter = headers.frameCounter;
+        this.frameCounter = headers.frameCounter ?? 1;
     }
 
-    protected static convertToUDPPacket(headers: Omit<IVbanHeaderCommon, 'srIndex'>, data: Buffer, sampleRate?: number): Buffer {
+    protected static convertToUDPPacket(headers: Omit<IVBANHeaderCommon, 'srIndex'>, data: Buffer, sampleRate?: number): Buffer {
         let bufferStart = 0;
 
         const headersBuffer = Buffer.alloc(28);
@@ -82,7 +82,7 @@ export class VBANPacket {
         headersBuffer.fill(headers.streamName.padEnd(16, '\0'), bufferStart, bufferStart + 16, 'ascii');
         bufferStart += 16;
 
-        headersBuffer.writeInt32LE(headers.frameCounter, bufferStart);
+        headersBuffer.writeUInt32LE(headers.frameCounter ?? 1, bufferStart);
 
         return Buffer.concat([headersBuffer, data.slice(0, VBAN_DATA_MAX_SIZE)]);
     }

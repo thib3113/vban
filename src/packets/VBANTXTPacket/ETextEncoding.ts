@@ -1,4 +1,4 @@
-export enum ETextStreamType {
+export enum ETextEncoding {
     VBAN_TXT_ASCII = 0x00,
     VBAN_TXT_UTF8 = 0x10,
     VBAN_TXT_WCHAR = 0x20,

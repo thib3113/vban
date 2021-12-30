@@ -1,4 +1,5 @@
-import { VBANServer, VBANAudioPacket } from '../src';
+import dgram from 'dgram';
+import { VBANAudioPacket, VBANProtocolFactory } from '../../src';
 
 //need to install "speaker" module
 import Speaker from 'speaker';
@@ -16,14 +17,16 @@ let currentConfig: ISpeakerConfiguration;
 let speaker: Speaker;
 
 //create UDP server
-const server = new VBANServer();
+const server = dgram.createSocket('udp4');
 server.on('error', (err) => {
     console.log(`server error:\n${err.stack}`);
     server.close();
 });
 
-server.on('message', (packet, sender) => {
+server.on('message', (msg, sender) => {
     try {
+        const packet = VBANProtocolFactory.processPacket(msg);
+
         if (packet instanceof VBANAudioPacket) {
             //generate speaker configuration from VBAN packet
             const newConfig = headerToSpeakerConfig(packet);
@@ -39,9 +42,6 @@ server.on('message', (packet, sender) => {
             }
 
             speaker.write(packet.data);
-
-            //you can also proxy it to another VM, maybe changing the streamName
-            // server.send(packet, 6980, '192.168.1.2');
         }
     } catch (e) {
         console.error(e);

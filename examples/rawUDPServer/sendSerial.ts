@@ -1,6 +1,7 @@
-import { VBANServer, VBANSerialPacket, EFormatBit, sampleRates, ESerialStreamType } from '../src';
+import dgram from 'dgram';
+import { VBANSerialPacket, EFormatBit, sampleRates, ESerialStreamType } from '../../src';
 
-const server = new VBANServer();
+const server = dgram.createSocket('udp4');
 
 server.on('error', (err) => {
     console.log(`server error:\n${err.stack}`);
@@ -24,7 +25,7 @@ server.on('listening', () => {
         },
         Buffer.from('b0036a', 'hex')
     );
-    server.send(packet, 7000, '192.168.1.2');
+    server.send(VBANSerialPacket.toUDPPacket(packet), 7000, '192.168.1.2');
 });
 
 server.bind(7000);

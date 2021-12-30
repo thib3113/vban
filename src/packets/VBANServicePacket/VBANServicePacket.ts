@@ -36,12 +36,13 @@ export class VBANServicePacket extends VBANPacket {
 
         const fn = headers.part1;
         const serviceFunction = fn & 0b01111111;
-        const isReply = (fn & 0b10000000) === 1;
+        const isReply = (fn & 0b10000000) >= 1;
         const service = headers.part2;
         if (!EServiceType[service]) {
             throw new Error(`unknown service ${service}`);
         }
 
+        console.log(dataBuffer.toString('hex'));
         let currentByte = 0;
         const getXNextBytes = (size: number): Buffer => {
             const b = dataBuffer.slice(currentByte, currentByte + size);

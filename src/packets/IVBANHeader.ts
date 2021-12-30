@@ -5,5 +5,5 @@ export interface IVBANHeader {
     srIndex?: number;
     sp: ESubProtocol;
     streamName: string;
-    frameCounter: number;
+    frameCounter?: number;
 }

@@ -2,7 +2,7 @@ import { VBANPacket } from '../VBANPacket';
 import { Buffer } from 'buffer';
 import { ESubProtocol } from '../ESubProtocol';
 import { BITS_SPEEDS, EFormatBit } from '../../commons';
-import { ETextStreamType } from './ETextStreamType';
+import { ETextEncoding } from './ETextEncoding';
 import { IVBANHeaderTEXT } from './IVBANHeaderTEXT';
 
 export class VBANTEXTPacket extends VBANPacket {
@@ -11,7 +11,7 @@ export class VBANTEXTPacket extends VBANPacket {
     public bps: number;
     public channelsIdents: number;
     public formatBit: EFormatBit;
-    public streamType: ETextStreamType;
+    public encoding: ETextEncoding;
     /**
      * if data can be decoded, it will be decoded in text
      */
@@ -28,14 +28,14 @@ export class VBANTEXTPacket extends VBANPacket {
         this.bps = this.sr;
         this.channelsIdents = headers.channelsIdents ?? 0;
         this.formatBit = headers.formatBit;
-        this.streamType = headers.streamType;
+        this.encoding = headers.streamType;
 
         this.text = txt;
         this.dataBuffer = dataBuffer;
     }
 
     public static toUDPPacket(packet: VBANTEXTPacket): Buffer {
-        const data = packet.text ? Buffer.from(packet.text, this.getEncoding(packet.streamType)) : packet.dataBuffer ?? Buffer.from('');
+        const data = packet.text ? Buffer.from(packet.text, this.getEncoding(packet.encoding)) : packet.dataBuffer ?? Buffer.from('');
 
         return this.convertToUDPPacket(
             {
@@ -45,7 +45,7 @@ export class VBANTEXTPacket extends VBANPacket {
                 frameCounter: packet.frameCounter,
                 part1: 0,
                 part2: packet.channelsIdents,
-                part3: (packet.formatBit & 0b00000111) | (packet.streamType & 0b11110000)
+                part3: (packet.formatBit & 0b00000111) | (packet.encoding & 0b11110000)
             },
             data,
             packet.bps
@@ -59,7 +59,7 @@ export class VBANTEXTPacket extends VBANPacket {
             throw new Error(`unknown bits speed ${headers.srIndex}`);
         }
 
-        const bps = BITS_SPEEDS[headers.srIndex] as number;
+        const bps = BITS_SPEEDS[headers.srIndex];
 
         const channelsIdents = headers.part2;
 
@@ -70,7 +70,7 @@ export class VBANTEXTPacket extends VBANPacket {
         }
 
         const streamType = dataFormat & 0b11110000;
-        if (!ETextStreamType[streamType]) {
+        if (!ETextEncoding[streamType]) {
             throw new Error(`unknown text stream type ${streamType}`);
         }
 
@@ -94,14 +94,14 @@ export class VBANTEXTPacket extends VBANPacket {
         );
     }
 
-    static getEncoding(streamType: ETextStreamType): BufferEncoding | undefined {
+    static getEncoding(streamType: ETextEncoding): BufferEncoding | undefined {
         let textEncoding: BufferEncoding | undefined;
-        if (streamType === ETextStreamType.VBAN_TXT_UTF8) {
+        if (streamType === ETextEncoding.VBAN_TXT_UTF8) {
             textEncoding = 'utf8';
-        } else if (streamType === ETextStreamType.VBAN_TXT_WCHAR) {
+        } else if (streamType === ETextEncoding.VBAN_TXT_WCHAR) {
             //need to test this, voicemeeter seems to doesn't use it
             textEncoding = 'utf16le';
-        } else if (streamType === ETextStreamType.VBAN_TXT_ASCII) {
+        } else if (streamType === ETextEncoding.VBAN_TXT_ASCII) {
             textEncoding = 'ascii';
         }
 

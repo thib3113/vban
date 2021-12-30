@@ -24,8 +24,30 @@
     "build": "tsc -p tsconfig.json",
     "build:prod": "yarn && tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build:prod",
+    "ci:generate:documentation": "typedoc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Thibaut SEVERAC",
-  "license": "ISC"
+  "author": {
+    "email": "thib3113@gmail.com",
+    "name": "Thibaut severac"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thib3113/vban.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thib3113/vban/issues"
+  },
+  "keywords": [
+    "VBAN",
+    "voicemeeter",
+    "MT-32",
+    "MT-64",
+    "MT-128",
+    "UDP"
+  ],
+  "dependencies": {
+    "typedoc": "^0.22.10"
+  }
 }

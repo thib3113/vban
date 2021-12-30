@@ -1,3 +1,3 @@
-export * from './ETextStreamType';
+export * from './ETextEncoding';
 export * from './VBANTEXTPacket';
 export * from './IVBANHeaderTEXT';
