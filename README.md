@@ -71,7 +71,7 @@ More Examples in the [examples folder](./examples)
 
 ## Documentation
 
-technical documentation is available [here](https://thib3113.github.io/VBAN/)
+technical documentation is available [here](https://thib3113.github.io/vban/)
 
 ## Package Status
 
