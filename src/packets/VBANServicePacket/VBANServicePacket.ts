@@ -42,7 +42,6 @@ export class VBANServicePacket extends VBANPacket {
             throw new Error(`unknown service ${service}`);
         }
 
-        console.log(dataBuffer.toString('hex'));
         let currentByte = 0;
         const getXNextBytes = (size: number): Buffer => {
             const b = dataBuffer.slice(currentByte, currentByte + size);
