@@ -10,7 +10,7 @@ export interface IVBANServerOptions {
         PreferredRate?: number;
         minRate?: number;
         maxRate?: number;
-        color?: { blue: 74; green: 232; red: 57 };
+        color?: { blue: number; green: number; red: number };
         nVersion?: number;
         GPSPosition?: string;
         userPosition?: string;
