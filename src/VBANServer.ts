@@ -35,6 +35,8 @@ export class VBANServer extends EventEmitter {
 
     private frameCounter: Map<ESubProtocol, number> = new Map<ESubProtocol, number>();
 
+    public isListening = false;
+
     constructor(options?: IVBANServerOptions) {
         super();
         //first check dependencies
@@ -58,6 +60,10 @@ export class VBANServer extends EventEmitter {
         //listen to server messages
         this.UDPServer.on('listening', (...args) => {
             this.emit('listening', ...args);
+            this.isListening = true;
+        });
+        this.UDPServer.on('close', () => {
+            this.isListening = false;
         });
         this.UDPServer.on('error', (...args) => {
             this.emit('error', ...args);
