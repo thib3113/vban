@@ -1,5 +1,5 @@
 # VBAN
-Implementation of the VBAN protocol in node-js ( rev 9, oct 2021 )
+Implementation of the VBAN protocol in node.js ( rev 9, oct 2021 )
 
 https://www.vb-audio.com/Voicemeeter/VBANProtocol_Specifications.pdf
 
