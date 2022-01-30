@@ -1,6 +1,6 @@
 {
   "name": "vban",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Node VBAN implementation",
   "main": "lib/index.js",
   "devDependencies": {
@@ -20,7 +20,7 @@
     "typescript": "4.5.2"
   },
   "scripts": {
-    "debug": "tsc && node -r source-map-support/register ./lib/example.js",
+    "debug": "tsc && node -r source-map-support/register ./lib/debug.js.js",
     "start": "node src/debug.ts",
     "build": "tsc -p tsconfig.json",
     "build:prod": "tsc -p tsconfig.build.json",
