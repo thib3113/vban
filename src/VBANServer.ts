@@ -68,7 +68,7 @@ export class VBANServer extends EventEmitter {
         this.UDPServer.on('error', (...args) => {
             this.emit('error', ...args);
         });
-        this.UDPServer.on('message', this.getMessageHandler());
+        this.UDPServer.on('message', this.messageHandler.bind(this));
     }
 
     public address(): AddressInfo {
@@ -162,20 +162,25 @@ export class VBANServer extends EventEmitter {
         this.send(answerPacket, sender.port, sender.address);
     }
 
-    private getMessageHandler(): (msg: Buffer, sender: RemoteInfo) => void {
-        return (msg, sender) => {
-            const packet = VBANProtocolFactory.processPacket(msg);
-            if (
-                this.options.autoReplyToPing &&
-                packet instanceof VBANServicePacket &&
-                packet.service == EServiceType.IDENTIFICATION &&
-                !packet.isReply
-            ) {
-                this.sendPing(sender, true);
+    private messageHandler = (msg: Buffer, sender: RemoteInfo): void => {
+        if (this.options.beforeProcessPacket) {
+            if (!this.options.beforeProcessPacket(msg, sender)) {
+                // 'packet will be skipped because beforeProcessPacket return false';
+                return;
             }
-            this.emit('message', packet, sender);
-        };
-    }
+        }
+
+        const packet = VBANProtocolFactory.processPacket(msg);
+        if (
+            this.options.autoReplyToPing &&
+            packet instanceof VBANServicePacket &&
+            packet.service == EServiceType.IDENTIFICATION &&
+            !packet.isReply
+        ) {
+            this.sendPing(sender, true);
+        }
+        this.emit('message', packet, sender);
+    };
 
     public close(cb?: () => void) {
         this.UDPServer.close(cb);

@@ -1,4 +1,5 @@
 import { EServicePINGApplicationType, EServicePINGFeatures } from './packets';
+import { RemoteInfo } from 'dgram';
 
 export interface IVBANServerOptions {
     application?: {
@@ -19,5 +20,12 @@ export interface IVBANServerOptions {
         userName?: string;
         userComment?: string;
     };
+    /**
+     * will auto send a reply when another app will send a ping
+     */
     autoReplyToPing?: boolean;
+    /**
+     * Return false to stop processing the packet
+     */
+    beforeProcessPacket?: (msg: Buffer, sender: RemoteInfo) => boolean;
 }
