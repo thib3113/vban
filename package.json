@@ -29,7 +29,8 @@
     "build:prod": "tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build:prod",
     "ci:generate:documentation": "typedoc",
-    "test:CI:coverage": "jest --ci --coverage",
+    "ci:test:coverage": "jest --ci --coverage",
+    "ci:eslint": "npm run lint -- -f json -o ./coverage/eslint-report.json",
     "test": "jest"
   },
   "author": {

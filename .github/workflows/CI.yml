@@ -71,7 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI: true
         with:
-          test-command: yarn run test:CI:coverage
+          test-command: yarn run ci:test:coverage
           coverage-comment: false
 
       - name: replace path in coverage files
