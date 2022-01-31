@@ -3,7 +3,7 @@ import { ESubProtocol } from '../ESubProtocol';
 import { BITS_SPEEDS, EFormatBit, serialStopModes } from '../../commons';
 import { ISerialBitMode } from './ISerialBitMode';
 import { ESerialStreamType } from './ESerialStreamType';
-import { IVBANHeaderTXT } from './IVBANHeaderTXT';
+import { IVBANHeaderSerial } from './IVBANHeaderSerial';
 import { Buffer } from 'buffer';
 
 export class VBANSerialPacket extends VBANPacket {
@@ -17,7 +17,7 @@ export class VBANSerialPacket extends VBANPacket {
 
     public data: Buffer;
 
-    constructor(headers: IVBANHeaderTXT, data: Buffer) {
+    constructor(headers: IVBANHeaderSerial, data: Buffer) {
         super({
             ...headers,
             sp: VBANSerialPacket.subProtocol
