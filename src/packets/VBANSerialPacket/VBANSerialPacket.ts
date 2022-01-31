@@ -12,7 +12,7 @@ export class VBANSerialPacket extends VBANPacket {
      */
     public static subProtocol: ESubProtocol = ESubProtocol.SERIAL;
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public subProtocol: ESubProtocol = VBANSerialPacket.subProtocol;
     /**
@@ -88,7 +88,7 @@ export class VBANSerialPacket extends VBANPacket {
         }
 
         //search bpsId
-        let bpsId =
+        const bpsId =
             Number(
                 Object.entries(BITS_SPEEDS)
                     .find(([, bps]) => bps && bps === packet.bps)

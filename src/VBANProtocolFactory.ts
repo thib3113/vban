@@ -15,7 +15,7 @@ export class VBANProtocolFactory {
         const header1 = headerBuffer.readUInt8(PACKET_IDENTIFICATION.length);
 
         // first 3 bits only
-        let subProtocol: ESubProtocol = header1 & 0b11100000;
+        const subProtocol: ESubProtocol = header1 & 0b11100000;
 
         return this.getConstructor(subProtocol).fromUDPPacket(headerBuffer, dataBuffer);
     }

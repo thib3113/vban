@@ -64,7 +64,7 @@ server.on('message', (packet, sender) => {
         }
         //check seriql packet
         else if (packet instanceof VBANSerialPacket) {
-            const packet1 = new VBANSerialPacket(
+            new VBANSerialPacket(
                 {
                     bitMode: { stop: 1, start: false, parity: false, multipart: false },
                     bps: BITS_SPEEDS[14],

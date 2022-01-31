@@ -32,6 +32,17 @@ module.exports = {
     // ],
 
     // A list of reporter names that Jest uses when writing coverage reports
+    reporters: [
+        'default',
+        [
+            'jest-sonar',
+            {
+                outputDirectory: path.join(__dirname, 'coverage'),
+                outputName: 'test-report.xml',
+                reportedFilePath: 'absolute'
+            }
+        ]
+    ],
     // coverageReporters: [
     //   "json",
     //   "text",
