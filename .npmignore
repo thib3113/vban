@@ -181,3 +181,4 @@ CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 .snyk
 /src/debug.ts
+tsdoc.json
