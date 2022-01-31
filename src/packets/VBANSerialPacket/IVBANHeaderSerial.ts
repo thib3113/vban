@@ -3,7 +3,7 @@ import { ISerialBitMode } from './ISerialBitMode';
 import { EFormatBit } from '../../commons';
 import { ESerialStreamType } from './ESerialStreamType';
 
-export interface IVBANHeaderSerial extends Omit<IVBANHeader, 'sp'> {
+export interface IVBANHeaderSerial extends Omit<IVBANHeader, 'sp' | 'sr'> {
     /**
      * {@link VBANSerialPacket.bitMode}
      */

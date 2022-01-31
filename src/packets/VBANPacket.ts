@@ -17,7 +17,7 @@ export class VBANPacket {
 
     public static frameCounters: Map<string, number> = new Map<string, number>();
 
-    public static prepareFromUDPPacket(headersBuffer: Buffer): IVBANHeaderCommon {
+    public static prepareFromUDPPacket(headersBuffer: Buffer, checkSR = true): IVBANHeaderCommon {
         const headers: Partial<IVBANHeaderCommon> = {};
 
         // SR / Sub protocol (5 + 3 bits)
@@ -25,7 +25,7 @@ export class VBANPacket {
         //take last 5 bits for sampleRate
         const srIndex = srsp & 0b00011111; // 5 last Bits
 
-        if (!sampleRates.hasOwnProperty(srIndex) || !sampleRates[srIndex]) {
+        if ((checkSR && !sampleRates.hasOwnProperty(srIndex)) || sampleRates[srIndex] === undefined) {
             throw new Error(`unknown sample rate ${srIndex}`);
         }
         headers.sr = sampleRates[srIndex];

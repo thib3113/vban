@@ -37,7 +37,7 @@ export class VBANProtocolFactory {
         }
     }
 
-    public static toUDPBuffer(packet: VBANAudioPacket | VBANSerialPacket | VBANTEXTPacket | VBANServicePacket | any): Buffer {
+    public static toUDPBuffer(packet: VBANAudioPacket | VBANSerialPacket | VBANTEXTPacket | VBANServicePacket | unknown): Buffer {
         let buffer: Buffer;
         if (packet instanceof VBANAudioPacket) {
             buffer = VBANAudioPacket.toUDPPacket(packet);

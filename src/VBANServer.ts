@@ -163,6 +163,7 @@ export class VBANServer extends EventEmitter {
     }
 
     private messageHandler = (msg: Buffer, sender: RemoteInfo): void => {
+        console.log(msg.toString('hex'));
         if (this.options.beforeProcessPacket) {
             if (!this.options.beforeProcessPacket(msg, sender)) {
                 // 'packet will be skipped because beforeProcessPacket return false';
