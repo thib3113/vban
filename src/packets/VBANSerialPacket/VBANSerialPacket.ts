@@ -7,12 +7,42 @@ import { IVBANHeaderSerial } from './IVBANHeaderSerial';
 import { Buffer } from 'buffer';
 
 export class VBANSerialPacket extends VBANPacket {
+    /**
+     * {@link VBANSerialPacket.subProtocol}
+     */
     public static subProtocol: ESubProtocol = ESubProtocol.SERIAL;
+    /**
+     * @inheritDoc
+     */
     public subProtocol: ESubProtocol = VBANSerialPacket.subProtocol;
+    /**
+     * This field is used to give possible information on COM port and serial transmission mode related
+     * to a Hardware COM port. This is made to possibly emulate COM to COM port connections and
+     * let the receiver configure the physical COM port in the right mode.
+     */
     public bitMode: ISerialBitMode;
+    /**
+     * Can be used to define a sub channel (sub serial link) and then manage up to 256 different
+     * serial virtual pipes (ZERO by default).
+     */
     public channelsIdents: number;
+    /**
+     * SR / bps : Bit rate is given in bps for information only. But it can be useful if serial data come from or go to
+     * a particular COM port. Set to ZERO if there is no particular bit rate.
+     */
     public bps: number;
+    /**
+     * not used . Replaced by {@link VBANSerialPacket.bps}
+     */
+    public sr: number = 0;
+    /**
+     * Data type used to store data in the packet (ZERO per default). The index is stored on 3 first bits.
+     * Bit 3 must be ZERO. Bits 4 to 7 gives additional mode
+     */
     public formatBit: EFormatBit;
+    /**
+     * type of stream . MIDI or SERIAL ... But in practice, only serial is used (MIDI is serial)
+     */
     public streamType: ESerialStreamType;
 
     public data: Buffer;
@@ -74,7 +104,7 @@ export class VBANSerialPacket extends VBANPacket {
             throw new Error(`unknown bits speed ${headers.srIndex}`);
         }
 
-        const bps = BITS_SPEEDS[headers.srIndex] as number;
+        const bps = BITS_SPEEDS[headers.srIndex];
 
         const bitModeRaw = headers.part1;
 

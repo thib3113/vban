@@ -6,6 +6,9 @@ import { VBAN_DATA_MAX_SIZE } from './VBANSpecs';
 import { Buffer } from 'buffer';
 
 export class VBANPacket {
+    /**
+     * the subProtocol of this packet
+     */
     public subProtocol: ESubProtocol = ESubProtocol.AUDIO;
 
     public streamName: string;
