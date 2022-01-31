@@ -32,7 +32,7 @@ const server = new VBANServer({
         userComment: ''
     },
     beforeProcessPacket: (msg, sender) => {
-        return sender.address === '127.0.0.1';
+        return true;
     }
 });
 // const server = dgram.createSocket('udp4');
@@ -60,7 +60,8 @@ server.on('message', (packet, sender) => {
             //
             // speaker.write(packet.data);
             packet.streamName = 'test';
-            server.send(packet, 6980, '127.0.0.1');
+            // server.send(packet, 6980, '127.0.0.1');
+            console.log(packet.data.length);
         }
         //check seriql packet
         else if (packet instanceof VBANSerialPacket) {
@@ -97,7 +98,7 @@ server.on('listening', () => {
         {
             streamName: 'Command1',
             formatBit: EFormatBit.VBAN_DATATYPE_BYTE8,
-            streamType: ETextEncoding.VBAN_TXT_UTF8
+            encoding: ETextEncoding.VBAN_TXT_UTF8
         },
         'test'
     );
