@@ -60,6 +60,9 @@ export class VBANSerialPacket extends VBANPacket {
         this.streamType = headers.streamType;
 
         this.data = data;
+
+        //reset sr
+        this.sr = 0;
     }
 
     public static toUDPPacket(packet: VBANSerialPacket): Buffer {
@@ -87,7 +90,7 @@ export class VBANSerialPacket extends VBANPacket {
             {
                 streamName: packet.streamName,
                 sp: packet.subProtocol,
-                sr: packet.sr,
+                sr: packet.bps,
                 frameCounter: packet.frameCounter,
                 part1,
                 part2: packet.channelsIdents,
