@@ -61,7 +61,7 @@ server.on('message', (packet, sender) => {
             // speaker.write(packet.data);
             packet.streamName = 'test';
             // server.send(packet, 6980, '127.0.0.1');
-            console.log(packet.data.length);
+            // console.log(packet.data.length);
         }
         //check seriql packet
         else if (packet instanceof VBANSerialPacket) {

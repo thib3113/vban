@@ -11,7 +11,7 @@ describe('VBANTextPacket.test.ts', () => {
 
             if (packet instanceof VBANTEXTPacket) {
                 expect(packet.subProtocol).toBe(ESubProtocol.TEXT);
-                //always 0 for a Serial packet
+                //always 0 for a Service packet
                 expect(packet.sr).toBe(0);
 
                 expect(packet.streamName).toBe('Command1');

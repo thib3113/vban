@@ -56,7 +56,7 @@ server.on('listening', () => {
 server.bind(7000);
 
 function headerToSpeakerConfig(header: VBANAudioPacket): ISpeakerConfiguration {
-    const bitResolution = VBANAudioPacket.bitResolutions[header.bitResolution];
+    const bitResolution = header.bitResolutionObject;
 
     return {
         channels: header.nbChannel,

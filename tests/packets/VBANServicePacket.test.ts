@@ -22,7 +22,7 @@ describe('VBANServicePacket.test.ts', () => {
 
             if (packet instanceof VBANServicePacket) {
                 expect(packet.subProtocol).toBe(ESubProtocol.SERVICE);
-                //always 0 for a Serial packet
+                //always 0 for a Service packet
                 expect(packet.sr).toBe(0);
 
                 expect(packet.streamName).toBe('VBAN Service');

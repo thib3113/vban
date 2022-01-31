@@ -1,4 +1,5 @@
 export * from './EBitsResolutions';
 export * from './ECodecs';
 export * from './VBANAudioPacket';
-export { IVBANHeaderAudio } from './IVBANHeaderAudio';
+export * from './IVBANHeaderAudio';
+export * from './IBitResolution';
