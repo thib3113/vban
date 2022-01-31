@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-As unifi-client is a community-driven open source project, and our resources are limited
+As this package (vban) is a community-driven open source project, and our resources are limited
 we accept security fixes only on the latest released version and also on the sources published
 in the main branch of this GitHub project.
 

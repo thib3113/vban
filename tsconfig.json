@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
-    "lib": ["es2018", "dom", "esnext"],
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2020",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es2020", "dom", "esnext"],
     "sourceMap": true,
     "allowJs": true,
     "esModuleInterop": true,
@@ -10,7 +13,6 @@
     "declaration": true,
     "outDir": "lib"
   },
-  "extends": "@tsconfig/node14/tsconfig.json",
   "exclude": [
     "node_modules",
     "tests"

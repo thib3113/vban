@@ -12,7 +12,7 @@ export class VBANSerialPacket extends VBANPacket {
      */
     public static subProtocol: ESubProtocol = ESubProtocol.SERIAL;
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public subProtocol: ESubProtocol = VBANSerialPacket.subProtocol;
     /**
@@ -50,7 +50,8 @@ export class VBANSerialPacket extends VBANPacket {
     constructor(headers: IVBANHeaderSerial, data: Buffer) {
         super({
             ...headers,
-            sp: VBANSerialPacket.subProtocol
+            sp: VBANSerialPacket.subProtocol,
+            sr: 0
         });
 
         this.bitMode = headers.bitMode;
@@ -86,6 +87,14 @@ export class VBANSerialPacket extends VBANPacket {
             part1 |= 0b10000000;
         }
 
+        //search bpsId
+        const bpsId =
+            Number(
+                Object.entries(BITS_SPEEDS)
+                    .find(([, bps]) => bps && bps === packet.bps)
+                    ?.shift()
+            ) || 0;
+
         return this.convertToUDPPacket(
             {
                 streamName: packet.streamName,
@@ -96,14 +105,15 @@ export class VBANSerialPacket extends VBANPacket {
                 part2: packet.channelsIdents,
                 part3: (packet.formatBit & 0b00000111) | (packet.streamType & 0b11110000)
             },
-            packet.data
+            packet.data,
+            bpsId
         );
     }
 
     public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANSerialPacket {
-        const headers = this.prepareFromUDPPacket(headersBuffer);
+        const headers = this.prepareFromUDPPacket(headersBuffer, false);
 
-        if (!headers.srIndex || !BITS_SPEEDS[headers.srIndex]) {
+        if (headers.srIndex === undefined || BITS_SPEEDS[headers.srIndex] === undefined) {
             throw new Error(`unknown bits speed ${headers.srIndex}`);
         }
 

@@ -15,7 +15,7 @@ export class VBANProtocolFactory {
         const header1 = headerBuffer.readUInt8(PACKET_IDENTIFICATION.length);
 
         // first 3 bits only
-        let subProtocol: ESubProtocol = header1 & 0b11100000;
+        const subProtocol: ESubProtocol = header1 & 0b11100000;
 
         return this.getConstructor(subProtocol).fromUDPPacket(headerBuffer, dataBuffer);
     }
@@ -37,7 +37,7 @@ export class VBANProtocolFactory {
         }
     }
 
-    public static toUDPBuffer(packet: VBANAudioPacket | VBANSerialPacket | VBANTEXTPacket | VBANServicePacket | any): Buffer {
+    public static toUDPBuffer(packet: VBANAudioPacket | VBANSerialPacket | VBANTEXTPacket | VBANServicePacket | unknown): Buffer {
         let buffer: Buffer;
         if (packet instanceof VBANAudioPacket) {
             buffer = VBANAudioPacket.toUDPPacket(packet);

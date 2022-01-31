@@ -74,7 +74,7 @@ export class VBANTEXTPacket extends VBANPacket {
             throw new Error(`unknown text stream type ${streamType}`);
         }
 
-        let textEncoding = this.getEncoding(streamType);
+        const textEncoding = this.getEncoding(streamType);
 
         let text;
         if (textEncoding) {

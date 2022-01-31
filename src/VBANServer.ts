@@ -41,12 +41,14 @@ export class VBANServer extends EventEmitter {
         super();
         //first check dependencies
         try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             this.UDPServer = require('dgram').createSocket('udp4');
         } catch (e) {
             throw new Error('fail to open udp4 socket. Is dgram dependency available ?');
         }
 
         try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             this.os = require('os');
         } catch (e) {
             throw new Error('fail to retrieve OS informations. Is os dependency available ?');
@@ -101,7 +103,7 @@ export class VBANServer extends EventEmitter {
     }
 
     public sendPing(sender: { address: string; port: number }, isReply = false): void {
-        let frameCounter = this.getFrameCounter(ESubProtocol.SERVICE);
+        const frameCounter = this.getFrameCounter(ESubProtocol.SERVICE);
 
         const defaultApp: Omit<IServicePing, 'reservedLongASCII'> = {
             applicationName: 'Test application',
@@ -163,6 +165,7 @@ export class VBANServer extends EventEmitter {
     }
 
     private messageHandler = (msg: Buffer, sender: RemoteInfo): void => {
+        console.log(msg.toString('hex'));
         if (this.options.beforeProcessPacket) {
             if (!this.options.beforeProcessPacket(msg, sender)) {
                 // 'packet will be skipped because beforeProcessPacket return false';

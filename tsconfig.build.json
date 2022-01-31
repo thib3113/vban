@@ -1,16 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["es2018", "dom", "esnext"],
-    "module": "commonjs",
-    "target": "es5",
     "sourceMap": false,
-    "allowJs": true,
-    "esModuleInterop": true,
-    "strictNullChecks": true,
-    "declaration": true,
-    "outDir": "lib"
   },
-  "extends": "@tsconfig/node14/tsconfig.json",
+  "extends": "./tsconfig.json",
   "exclude": [
     "node_modules",
     "tests"

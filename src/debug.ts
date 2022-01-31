@@ -1,4 +1,4 @@
-import { EFormatBit, sampleRates } from './commons';
+import { BITS_SPEEDS, EFormatBit } from './commons';
 import {
     ESerialStreamType,
     EServicePINGApplicationType,
@@ -30,6 +30,9 @@ const server = new VBANServer({
         deviceName: 'NodeJs Server',
         userName: '',
         userComment: ''
+    },
+    beforeProcessPacket: (msg, sender) => {
+        return sender.address === '127.0.0.1';
     }
 });
 // const server = dgram.createSocket('udp4');
@@ -61,16 +64,15 @@ server.on('message', (packet, sender) => {
         }
         //check seriql packet
         else if (packet instanceof VBANSerialPacket) {
-            const packet1 = new VBANSerialPacket(
+            new VBANSerialPacket(
                 {
                     bitMode: { stop: 1, start: false, parity: false, multipart: false },
-                    bps: 0,
+                    bps: BITS_SPEEDS[14],
                     channelsIdents: 0,
                     formatBit: EFormatBit.VBAN_DATATYPE_BYTE8,
                     frameCounter: 0,
                     streamName: '',
-                    streamType: ESerialStreamType.VBAN_SERIAL_MIDI,
-                    sr: sampleRates[4]
+                    streamType: ESerialStreamType.VBAN_SERIAL_MIDI
                 },
                 Buffer.from('b0036a', 'hex')
             );
