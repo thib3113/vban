@@ -8,15 +8,28 @@ import { Buffer } from 'buffer';
 export class VBANPacket {
     /**
      * the subProtocol of this packet
+     * {@link ESubProtocol}
      */
     public subProtocol: ESubProtocol = ESubProtocol.AUDIO;
-
+    /**
+     * the name of the current stream .
+     * Voicemeeter rely on it to allow a packet or not
+     */
     public streamName: string;
+    /**
+     * Sample Rate for this stream
+     */
     public sr: number;
+    /**
+     * frameCounter allow checking if you receive frame in order, and without losing them
+     */
     public frameCounter: number;
 
     public static frameCounters: Map<string, number> = new Map<string, number>();
 
+    /**
+     * Extract headers and data from UDPPacket, each Packet will continue the process
+     */
     public static prepareFromUDPPacket(headersBuffer: Buffer, checkSR = true): IVBANHeaderCommon {
         const headers: Partial<IVBANHeaderCommon> = {};
 
@@ -48,6 +61,9 @@ export class VBANPacket {
         return headers as IVBANHeaderCommon;
     }
 
+    /**
+     * common constructor
+     */
     constructor(headers: IVBANHeader) {
         this.sr = headers.sr;
         this.streamName = headers.streamName;
@@ -55,6 +71,9 @@ export class VBANPacket {
         this.frameCounter = headers.frameCounter ?? 1;
     }
 
+    /**
+     * Convert a VBANPacket to a UDP packet
+     */
     protected static convertToUDPPacket(headers: Omit<IVBANHeaderCommon, 'srIndex'>, data: Buffer, sampleRate?: number): Buffer {
         let bufferStart = 0;
 
@@ -87,9 +106,18 @@ export class VBANPacket {
 
         headersBuffer.writeUInt32LE(headers.frameCounter ?? 1, bufferStart);
 
+        if (data.length > VBAN_DATA_MAX_SIZE) {
+            throw new Error(
+                `VBAN DATA MAX SIZE = ${VBAN_DATA_MAX_SIZE} ! You try to send a packet with ${data.length} bytes . You can use the exported var VBAN_DATA_MAX_SIZE to split your datas in packets`
+            );
+        }
+
         return Buffer.concat([headersBuffer, data.slice(0, VBAN_DATA_MAX_SIZE)]);
     }
 
+    /**
+     * EXPERIMENTAL - DO NOT USE
+     */
     public static checkFrameCounter(headers: VBANPacket) {
         //check frameCounter
         const frameCounterKey = 'str';

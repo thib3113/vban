@@ -19,7 +19,7 @@ server.on('listening', () => {
         {
             streamName: 'Command1', //the streamName waited by the other tool
             formatBit: EFormatBit.VBAN_DATATYPE_BYTE8, //the storage format, currently this is the only option available
-            streamType: ETextEncoding.VBAN_TXT_UTF8 //we will send it in UTF8, most of VM Tools use UTF8
+            encoding: ETextEncoding.VBAN_TXT_UTF8 //we will send it in UTF8, most of VM Tools use UTF8
         },
         'test' // => the message we want to send (always in UTF8, if streamType is not UTF8, the library will convert)
     );

@@ -1,7 +1,7 @@
 import { BITS_SPEEDS, EFormatBit, ESubProtocol, VBANProtocolFactory, VBANSerialPacket } from '../../src';
 import { Buffer } from 'buffer';
 
-describe('VBANSerial.test.ts', () => {
+describe('VBANSerialPacket.test.ts', () => {
     describe('from Buffer', () => {
         it('should handle basic convert buffer to packet', () => {
             const buffer = Buffer.from('5642414e2e0000004d4944493100000000000000000000009b000000b00270', 'hex');
@@ -133,5 +133,30 @@ describe('VBANSerial.test.ts', () => {
                 });
             });
         });
+    });
+    it('decode / encode test', () => {
+        const packet = new VBANSerialPacket(
+            {
+                streamName: 'MIDI1',
+                frameCounter: 155,
+                bitMode: {
+                    stop: 1,
+                    start: false,
+                    parity: false,
+                    multipart: false
+                },
+                channelsIdents: 0,
+                streamType: 0,
+                bps: BITS_SPEEDS[14],
+                formatBit: EFormatBit.VBAN_DATATYPE_BYTE8
+            },
+            Buffer.from([176, 2, 112])
+        );
+
+        const buffer = VBANProtocolFactory.toUDPBuffer(packet);
+        expect(buffer).toStrictEqual(Buffer.from('5642414e2e0000004d4944493100000000000000000000009b000000b00270', 'hex'));
+
+        const packet2 = VBANProtocolFactory.processPacket(buffer);
+        expect(packet2).toStrictEqual(packet);
     });
 });

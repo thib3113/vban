@@ -7,15 +7,34 @@ import { Buffer } from 'buffer';
 import { cleanPacketString, prepareStringForPacket } from '../../commons';
 import { EServicePINGFeatures } from './EServicePINGFeatures';
 import { IVBANHeaderService } from './IVBANHeaderService';
+import { EServiceFunction } from './EServiceFunction';
 
 export class VBANServicePacket extends VBANPacket {
+    /**
+     * {@link VBANServicePacket.subProtocol}
+     */
     public static subProtocol: ESubProtocol = ESubProtocol.SERVICE;
     public subProtocol: ESubProtocol = VBANServicePacket.subProtocol;
+    /**
+     * Sub Type of the service packet
+     * {@link EServiceType}
+     */
     public service: EServiceType;
-    public serviceFunction: number;
+    /**
+     * current function for this function
+     */
+    public serviceFunction: EServiceFunction;
+    /**
+     * answer is a reply to another request
+     */
     public isReply: boolean = false;
 
     public data: IServicePing;
+
+    /**
+     * not used .
+     */
+    public sr: number = 0;
 
     constructor(headers: IVBANHeaderService, data: IServicePing) {
         super({
@@ -29,6 +48,9 @@ export class VBANServicePacket extends VBANPacket {
         this.isReply = headers.isReply ?? false;
 
         this.data = data;
+
+        //force sr to 0
+        this.sr = 0;
     }
 
     public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANServicePacket {
