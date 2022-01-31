@@ -182,3 +182,4 @@ CONTRIBUTING.md
 .snyk
 /src/debug.ts
 tsdoc.json
+.editorconfig
