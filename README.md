@@ -5,7 +5,7 @@
 [![Downloads](https://img.shields.io/npm/dm/vban.svg)](https://www.npmjs.com/package/vban)
 [![License](https://img.shields.io/github/license/thib3113/vban.svg)](https://github.com/thib3113/vban/blob/main/LICENSE)
 [![Known Vulnerabilities](https://snyk.io/test/github/thib3113/vban/badge.svg)](https://snyk.io/test/github/thib3113/vban)
-[![vban](https://snyk.io/advisor/npm-package/vban/badge.svg)](https://snyk.io/advisor/npm-package/vban)
+[![vban](https://snyk-widget.herokuapp.com/badge/npm/vban/badge.svg)](https://snyk.io/advisor/npm-package/vban)
 [![GitHub stars](https://img.shields.io/github/stars/thib3113/vban.svg?style=social&label=Star)](https://github.com/thib3113/vban/stargazers/)
 [![Package Quality](https://packagequality.com/shield/vban.svg)](https://packagequality.com/#?package=vban)
 
