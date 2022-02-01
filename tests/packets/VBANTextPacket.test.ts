@@ -65,7 +65,6 @@ describe('VBANTextPacket.test.ts', () => {
         );
 
         const buffer = VBANProtocolFactory.toUDPBuffer(packet);
-        console.log(buffer.toString('hex'));
         expect(buffer).toStrictEqual(
             Buffer.from('5642414e52000010436f6d6d616e64310000000000000000180000006d79207465737420746578743b', 'hex')
         );
