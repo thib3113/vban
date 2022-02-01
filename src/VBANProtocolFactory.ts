@@ -17,7 +17,7 @@ export class VBANProtocolFactory {
         // first 3 bits only
         const subProtocol: ESubProtocol = header1 & 0b11100000;
 
-        return this.getConstructor(subProtocol).fromUDPPacket(headerBuffer, dataBuffer);
+        return VBANProtocolFactory.getConstructor(subProtocol).fromUDPPacket(headerBuffer, dataBuffer);
     }
 
     public static getConstructor(

@@ -63,7 +63,9 @@ export class VBANTEXTPacket extends VBANPacket {
     }
 
     public static toUDPPacket(packet: VBANTEXTPacket): Buffer {
-        const data = packet.text ? Buffer.from(packet.text, this.getEncoding(packet.encoding)) : packet.dataBuffer ?? Buffer.from('');
+        const data = packet.text
+            ? Buffer.from(packet.text, VBANTEXTPacket.getEncoding(packet.encoding))
+            : packet.dataBuffer ?? Buffer.from('');
 
         //search bpsId
         const bpsId =
@@ -110,7 +112,7 @@ export class VBANTEXTPacket extends VBANPacket {
             throw new Error(`unknown text stream type ${encoding}`);
         }
 
-        const textEncoding = this.getEncoding(encoding);
+        const textEncoding = VBANTEXTPacket.getEncoding(encoding);
 
         let text;
         if (textEncoding) {

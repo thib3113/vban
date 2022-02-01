@@ -74,7 +74,9 @@ export class VBANServicePacket extends VBANPacket {
         const bitType = getXNextBytes(4).readUInt32LE();
         const applicationType = EServicePINGApplicationType[bitType] ? bitType : EServicePINGApplicationType.UNKNOWN;
         const bitFeature = getXNextBytes(4).readUInt32LE();
-        const features = (Object.entries(EServicePINGFeatures).filter(([k]) => isNaN(Number(k))) as Array<[string, EServicePINGFeatures]>)
+        const features = (
+            Object.entries(EServicePINGFeatures).filter(([k]) => Number.isNaN(Number(k))) as Array<[string, EServicePINGFeatures]>
+        )
             .filter(([, v]) => bitFeature & v)
             .map(([, v]) => v);
         const bitFeatureEx = getXNextBytes(4).readUInt32LE();
