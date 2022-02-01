@@ -1,5 +1,7 @@
 import { Buffer } from 'buffer';
-import { ESubProtocol, MAX_FRAME_COUNTER, VBANPacket, VBANServicePacket } from '../src';
+import { EServiceType, ESubProtocol, MAX_FRAME_COUNTER, VBANPacket, VBANServicePacket } from '../src';
+// noinspection ES6PreferShortImport
+import { VBANServer } from '../src/VBANServer';
 
 jest.resetModules();
 const processPacketMock = jest.fn();
@@ -15,14 +17,12 @@ jest.mock('../src/VBANProtocolFactory', () => {
 
 jest.mock('../src/packets/VBANServicePacket/VBANServicePacket');
 
-// noinspection ES6PreferShortImport
-import { VBANServer } from '../src/VBANServer';
-
 const socketMock = {
     on: jest.fn(),
     bind: jest.fn(),
     address: jest.fn(),
-    send: jest.fn()
+    send: jest.fn(),
+    close: jest.fn()
 };
 const createSocketMock = jest.fn();
 const osMock = {
@@ -267,6 +267,109 @@ describe('VBANServer.test.ts', () => {
                     userPosition: ''
                 }
             );
+        });
+    });
+
+    describe('messageHandler', () => {
+        it('should send a message', () => {
+            const server = new VBANServer({
+                autoReplyToPing: false
+            });
+
+            const emitMock = jest.fn();
+            server.emit = emitMock;
+            const packet = { bar: 'foo' };
+            processPacketMock.mockImplementationOnce(() => packet);
+
+            const sender = { address: '127.0.0.1', port: 6980 };
+            const udpBuffer = Buffer.from('aaaaaaaaaaa');
+            // @ts-ignore
+            server.messageHandler(udpBuffer, sender);
+
+            expect(processPacketMock).toHaveBeenCalledWith(udpBuffer);
+            expect(emitMock).toHaveBeenCalledWith('message', packet, sender);
+        });
+
+        describe('beforeProcessPacket', () => {
+            it('should refuse', () => {
+                const beforeProcessMock = jest.fn().mockReturnValue(false);
+                const server = new VBANServer({
+                    autoReplyToPing: false,
+                    beforeProcessPacket: beforeProcessMock
+                });
+
+                const emitMock = jest.fn();
+                server.emit = emitMock;
+
+                const sender = { address: '127.0.0.1', port: 6980 };
+                const udpBuffer = Buffer.from('aaaaaaaaaaa');
+                // @ts-ignore
+                server.messageHandler(udpBuffer, sender);
+
+                expect(beforeProcessMock).toHaveBeenCalledWith(udpBuffer, sender);
+                expect(processPacketMock).not.toHaveBeenCalled();
+                expect(emitMock).not.toHaveBeenCalled();
+            });
+            it('should accept', () => {
+                const beforeProcessMock = jest.fn().mockReturnValue(true);
+                const server = new VBANServer({
+                    autoReplyToPing: false,
+                    beforeProcessPacket: beforeProcessMock
+                });
+
+                const emitMock = jest.fn();
+                server.emit = emitMock;
+                const packet = { bar: 'foo2' };
+                processPacketMock.mockImplementationOnce(() => packet);
+
+                const sender = { address: '127.0.0.1', port: 6980 };
+                const udpBuffer = Buffer.from('aaaaaaaaaaa');
+                // @ts-ignore
+                server.messageHandler(udpBuffer, sender);
+
+                expect(beforeProcessMock).toHaveBeenCalledWith(udpBuffer, sender);
+                expect(processPacketMock).toHaveBeenCalledWith(udpBuffer);
+                expect(emitMock).toHaveBeenCalledWith('message', packet, sender);
+            });
+        });
+
+        describe('autoReply', () => {
+            it('should autoReply to ping', () => {
+                const server = new VBANServer({
+                    autoReplyToPing: true
+                });
+
+                const emitMock = jest.fn();
+                server.emit = emitMock;
+                // @ts-ignore
+                const packet = new VBANServicePacket({});
+                packet.service = EServiceType.IDENTIFICATION;
+                packet.isReply = false;
+                processPacketMock.mockImplementationOnce(() => packet);
+                const sendPingMock = jest.fn();
+                server.sendPing = sendPingMock;
+
+                const sender = { address: '127.0.0.1', port: 6980 };
+                const udpBuffer = Buffer.from('aaaaaaaaaaa');
+                // @ts-ignore
+                server.messageHandler(udpBuffer, sender);
+                expect(processPacketMock).toHaveBeenCalledWith(udpBuffer);
+                expect(emitMock).toHaveBeenCalledWith('message', packet, sender);
+
+                expect(sendPingMock).toHaveBeenCalledWith(sender, true);
+            });
+        });
+    });
+
+    describe('close', () => {
+        it('should call close udp', () => {
+            const server = new VBANServer();
+
+            const fn = () => true;
+
+            server.close(fn);
+
+            expect(socketMock.close).toHaveBeenCalledWith(fn);
         });
     });
 });
