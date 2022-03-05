@@ -11,7 +11,7 @@
     "@typescript-eslint/parser": "5.13.0",
     "dotenv": "16.0.0",
     "eslint": "8.10.0",
-    "eslint-config-prettier": "8.4.0",
+    "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-tsdoc": "0.2.14",
     "jest": "27.5.1",
