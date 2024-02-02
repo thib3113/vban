@@ -25,7 +25,7 @@ export class VBANPacket {
      */
     public frameCounter: number;
 
-    public static frameCounters: Map<string, number> = new Map<string, number>();
+    public static readonly frameCounters: Map<string, number> = new Map<string, number>();
 
     /**
      * Extract headers and data from UDPPacket, each Packet will continue the process
