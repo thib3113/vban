@@ -14,6 +14,9 @@ jobs:
       matrix:
         node-version: [ lts/*, 16]
 
+    permissions:
+      checks: write
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
