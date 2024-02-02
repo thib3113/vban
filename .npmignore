@@ -61,8 +61,6 @@ fabric.properties
 # Ignores the whole idea folder
 # See https://github.com/joeblau/gitignore.io/issues/186 and https://github.com/joeblau/gitignore.io/issues/360
 
-../unifi-blockIp/.idea/
-
 ### Node ###
 # Logs
 logs
@@ -157,7 +155,6 @@ yarn.lock
 
 .github
 .husky
-coverage
 docs
 src
 tests
@@ -180,6 +177,7 @@ sonar-project.properties
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 .snyk
-/src/debug.ts
 tsdoc.json
 .editorconfig
+
+lib/debug.*
