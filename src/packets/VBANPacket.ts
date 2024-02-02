@@ -1,6 +1,6 @@
 import { ESubProtocol } from './ESubProtocol';
 import { IVBANHeaderCommon } from './IVBANHeaderCommon';
-import { cleanPacketString, PACKET_IDENTIFICATION, sampleRates } from '../commons';
+import { cleanPacketString, PACKET_IDENTIFICATION, sampleRates, STREAM_NAME_LENGTH } from '../commons';
 import { IVBANHeader } from './IVBANHeader';
 import { VBAN_DATA_MAX_SIZE } from './VBANSpecs';
 import { Buffer } from 'buffer';
@@ -25,7 +25,7 @@ export class VBANPacket {
      */
     public frameCounter: number;
 
-    public static frameCounters: Map<string, number> = new Map<string, number>();
+    public static readonly frameCounters: Map<string, number> = new Map<string, number>();
 
     /**
      * Extract headers and data from UDPPacket, each Packet will continue the process
@@ -53,7 +53,7 @@ export class VBANPacket {
         headers.part3 = headersBuffer.readUInt8(7);
 
         // Stream Name (16 bytes)
-        headers.streamName = cleanPacketString(headersBuffer.toString('ascii', 8, 24));
+        headers.streamName = cleanPacketString(headersBuffer.toString('ascii', 8, 8 + STREAM_NAME_LENGTH));
 
         // Frame Counter (32 bits)
         headers.frameCounter = headersBuffer.readUInt32LE(24);
@@ -101,8 +101,8 @@ export class VBANPacket {
         headersBuffer.fill(headers.part2, bufferStart++);
         headersBuffer.fill(headers.part3, bufferStart++);
 
-        headersBuffer.fill(headers.streamName.padEnd(16, '\0'), bufferStart, bufferStart + 16, 'ascii');
-        bufferStart += 16;
+        headersBuffer.fill(headers.streamName.padEnd(STREAM_NAME_LENGTH, '\0'), bufferStart, bufferStart + STREAM_NAME_LENGTH, 'ascii');
+        bufferStart += STREAM_NAME_LENGTH;
 
         headersBuffer.writeUInt32LE(headers.frameCounter ?? 1, bufferStart);
 

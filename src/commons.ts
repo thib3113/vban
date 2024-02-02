@@ -1,5 +1,10 @@
 export const PACKET_IDENTIFICATION = 'VBAN';
 
+/**
+ * the stream name is limited to 16 bytes
+ */
+export const STREAM_NAME_LENGTH = 16;
+
 export const BITS_SPEEDS: Record<number, number> = {
     0: 0,
     1: 110,
