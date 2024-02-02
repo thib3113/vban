@@ -18,19 +18,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-
-      # try to perform a nodejs setup
       - uses: actions/setup-node@v4
         with:
-          node-version: 14.x
-
-      # run npm tests
+          node-version: lts/*
+          cache: yarn
       - name: npm install, build, and test
         run: |
-          npm install
-          npm run ci:generate:documentation
-        env:
-          CI: true
+          yarn install
+          yarn run ci:generate:documentation
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
