@@ -1,0 +1,26 @@
+{
+    "extends": [
+        "config:js-lib",
+        ":separateMajorReleases",
+        ":combinePatchMinorReleases",
+        ":prNotPending",
+        ":disableRateLimiting",
+        ":updateNotScheduled",
+        ":ignoreModulesAndTests",
+        ":pinDevDependencies",
+        ":enableVulnerabilityAlerts",
+        "group:monorepos",
+        "group:recommended",
+        "workarounds:all"
+    ],
+    "packageRules": [
+        {
+            "matchUpdateTypes": ["minor", "patch"],
+            "matchCurrentVersion": "!/^0/",
+            "automerge": true
+        }
+    ],
+    "dependencyDashboard": true,
+    "minimumReleaseAge": "3 days",
+    "assignees": ["thib3113"]
+}
