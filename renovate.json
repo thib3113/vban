@@ -20,7 +20,7 @@
             "automerge": true
         }
     ],
-    "dependencyDashboard": true,
+    "dependencyDashboard": false,
     "minimumReleaseAge": "3 days",
     "assignees": ["thib3113"]
 }
