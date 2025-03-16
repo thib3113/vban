@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [ lts/*, 16]
+        node-version: [ lts/*]
 
     permissions:
       checks: write
@@ -42,7 +42,7 @@ jobs:
         run: find ./coverage -type f -exec sed -i -e "s@$(pwd)@<root>@g" {} \;
         if: always()
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: |
@@ -51,7 +51,7 @@ jobs:
             ./coverage/lcov.info
             ./coverage/junit.xml
             ./coverage/test-report.xml
-        if: always()
+        if: matrix.node-version == 'lts/*'
 
 
   eslint:
@@ -73,9 +73,9 @@ jobs:
       - name: replace path in coverage files
         run: find ./coverage -type f -exec sed -i -e "s@$(pwd)@<root>@g" {} \;
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: coverage
+          name: eslint-coverage
           path: ./coverage/eslint-report.json
 
   send-coverage:
@@ -85,9 +85,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: coverage
+          path: ./coverage/
+      - uses: actions/download-artifact@v4
+        with:
+          name: eslint-coverage
           path: ./coverage/
       - uses: codecov/codecov-action@v3
         with:
@@ -102,9 +106,13 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: coverage
+          path: ./coverage/
+      - uses: actions/download-artifact@v4
+        with:
+          name: eslint-coverage
           path: ./coverage/
 
       - name: change coverage path in file
