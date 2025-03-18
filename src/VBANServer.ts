@@ -7,18 +7,20 @@ import {
     EServicePINGFeatures,
     EServiceType,
     ESubProtocol,
-    IServicePing,
+    IPacketPingData,
     MAX_FRAME_COUNTER,
     VBANPacket,
-    VBANPacketTypes,
-    VBANServicePacket
+    VBANPacketTypes
 } from './packets';
 import { VBANProtocolFactory } from './VBANProtocolFactory';
 import { IVBANServerOptions } from './IVBANServerOptions';
+import { VBANPingPacket } from './packets';
+import { promisify } from 'node:util';
 
 export interface VBANServerEvents {
     listening: () => void;
     error: (err: Error) => void;
+    close: () => void;
     message: (packet: VBANPacketTypes, sender: RemoteInfo) => void;
 }
 
@@ -32,10 +34,10 @@ export declare interface VBANServer {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class VBANServer extends EventEmitter {
     public readonly UDPServer: Socket;
-    private os: { hostname: () => string };
-    private options: IVBANServerOptions;
+    private readonly os: { hostname: () => string };
+    private readonly options: IVBANServerOptions;
 
-    private frameCounter: Map<ESubProtocol, number> = new Map<ESubProtocol, number>();
+    private readonly frameCounter: Map<ESubProtocol, number> = new Map<ESubProtocol, number>();
 
     public isListening = false;
 
@@ -79,19 +81,18 @@ export class VBANServer extends EventEmitter {
         return this.UDPServer.address();
     }
 
-    // on('message', packet:VBANPacketTypes): void;
-
-    bind(port?: number, address?: string, callback?: () => void): this;
-    bind(port?: number, callback?: () => void): this;
-    bind(callback?: () => void): this;
-    bind(options: BindOptions, callback?: () => void): this;
-    public bind(...args: []): this {
-        this.UDPServer.bind(...args);
-        return this;
+    bind(port?: number, address?: string): Promise<void>;
+    bind(port?: number): Promise<void>;
+    bind(): Promise<void>;
+    bind(options: BindOptions): Promise<void>;
+    public bind(...args: []): Promise<void> {
+        return new Promise<void>((resolve) => {
+            this.UDPServer.bind(...args, resolve);
+        });
     }
 
-    private getFrameCounter(protocol: ESubProtocol) {
-        let frameCounter = this.frameCounter.get(protocol) || 0;
+    private getFrameCounter(protocol: ESubProtocol): number {
+        let frameCounter = this.frameCounter.get(protocol) ?? 0;
         if (frameCounter >= MAX_FRAME_COUNTER) {
             frameCounter = 0;
         }
@@ -99,15 +100,24 @@ export class VBANServer extends EventEmitter {
         return frameCounter;
     }
 
-    public send(packet: VBANPacket, port: number, address: string) {
-        packet.frameCounter = this.getFrameCounter(packet.subProtocol);
-        this.UDPServer.send(VBANProtocolFactory.toUDPBuffer(packet), port, address);
+    public send(packet: VBANPacket, port: number, address: string): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            packet.frameCounter = this.getFrameCounter(packet.subProtocol);
+            this.UDPServer.send(VBANProtocolFactory.toUDPBuffer(packet), port, address, (error) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                resolve();
+            });
+        });
     }
 
-    public sendPing(sender: { address: string; port: number }, isReply = false): void {
+    public sendPing(receiver: { address: string; port: number }, isReply = false): Promise<void> {
         const frameCounter = this.getFrameCounter(ESubProtocol.SERVICE);
 
-        const defaultApp: Omit<IServicePing, 'reservedLongASCII'> = {
+        const defaultApp: Omit<IPacketPingData, 'hostnameASCII'> = {
             applicationName: 'Test application',
             manufacturerName: 'Anonymous',
             applicationType: EServicePINGApplicationType.SERVER,
@@ -130,7 +140,7 @@ export class VBANServer extends EventEmitter {
         };
         const application = Object.assign(defaultApp, this.options.application);
 
-        const answerPacket = new VBANServicePacket(
+        const answerPacket = new VBANPingPacket(
             {
                 streamName: 'VBAN Service',
                 service: EServiceType.IDENTIFICATION,
@@ -156,17 +166,17 @@ export class VBANServer extends EventEmitter {
                 reservedEx: application.reservedEx,
                 reservedEx2: application.reservedEx2,
                 deviceName: application.deviceName,
-                reservedLongASCII: this.os.hostname(),
+                hostnameASCII: application.hostname ?? this.os.hostname(),
                 userName: application.userName,
                 userComment: application.userComment
             }
         );
 
-        //send the answer to sender IP:port . (VM use listen port to send requests)
-        this.send(answerPacket, sender.port, sender.address);
+        //send the answer to receiver IP:port . (VM use listen port to send requests)
+        return this.send(answerPacket, receiver.port, receiver.address);
     }
 
-    private messageHandler = (msg: Buffer, sender: RemoteInfo): void => {
+    private readonly messageHandler = async (msg: Buffer, sender: RemoteInfo): Promise<void> => {
         if (this.options.beforeProcessPacket) {
             if (!this.options.beforeProcessPacket(msg, sender)) {
                 // 'packet will be skipped because beforeProcessPacket return false';
@@ -175,18 +185,14 @@ export class VBANServer extends EventEmitter {
         }
 
         const packet = VBANProtocolFactory.processPacket(msg);
-        if (
-            this.options.autoReplyToPing &&
-            packet instanceof VBANServicePacket &&
-            packet.service == EServiceType.IDENTIFICATION &&
-            !packet.isReply
-        ) {
-            this.sendPing(sender, true);
+        if (this.options.autoReplyToPing && packet instanceof VBANPingPacket && !packet.isReply) {
+            await this.sendPing(sender, true);
         }
         this.emit('message', packet, sender);
     };
 
-    public close(cb?: () => void) {
-        this.UDPServer.close(cb);
+    public async close() {
+        await promisify(this.UDPServer.close)();
+        this.emit('close');
     }
 }

@@ -1,5 +1,5 @@
 import dgram from 'dgram';
-import { VBANSerialPacket, EFormatBit, sampleRates, ESerialStreamType } from '../../src';
+import { EFormatBit, ESerialStreamType, VBANSerialPacket } from '../../src';
 
 const server = dgram.createSocket('udp4');
 
@@ -20,8 +20,7 @@ server.on('listening', () => {
             formatBit: EFormatBit.VBAN_DATATYPE_BYTE8,
             frameCounter: 0,
             streamName: '',
-            streamType: ESerialStreamType.VBAN_SERIAL_MIDI,
-            sr: sampleRates[4]
+            streamType: ESerialStreamType.VBAN_SERIAL_MIDI
         },
         Buffer.from('b0036a', 'hex')
     );

@@ -70,6 +70,23 @@ export function dec2bin(dec: number) {
     return ((dec >>> 0).toString(2) || '').padStart(8, '0');
 }
 
+export function bufferToHex(buffer: Buffer) {
+    if (!Buffer.isBuffer(buffer)) {
+        throw new Error('need to be a buffer');
+    }
+
+    let hexString = '';
+    for (let i = 0; i < buffer.length; i++) {
+        const hex = buffer[i].toString(16).padStart(2, '0');
+        hexString += hex;
+
+        if (i < buffer.length - 1) {
+            hexString += ' ';
+        }
+    }
+    return hexString;
+}
+
 export function prepareStringForPacket(str: string, maxLength: number): string {
     return str.slice(0, maxLength).padEnd(maxLength, '\0');
 }

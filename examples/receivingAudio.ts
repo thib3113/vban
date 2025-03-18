@@ -1,4 +1,4 @@
-import { VBANServer, VBANAudioPacket } from '../src';
+import { VBANAudioPacket, VBANServer } from '../src';
 
 //need to install "speaker" module
 import Speaker from 'speaker';
@@ -22,7 +22,7 @@ server.on('error', (err) => {
     server.close();
 });
 
-server.on('message', (packet, sender) => {
+server.on('message', (packet) => {
     try {
         if (packet instanceof VBANAudioPacket) {
             //generate speaker configuration from VBAN packet

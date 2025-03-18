@@ -1,4 +1,4 @@
-import { VBANServer, VBANTEXTPacket, EFormatBit, ETextEncoding } from '../src';
+import { EFormatBit, ETextEncoding, VBANServer, VBANTEXTPacket } from '../src';
 
 const server = new VBANServer();
 

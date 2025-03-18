@@ -10,7 +10,7 @@ export class VBANSerialPacket extends VBANPacket {
     /**
      * {@link VBANSerialPacket.subProtocol}
      */
-    public static subProtocol: ESubProtocol = ESubProtocol.SERIAL;
+    public static readonly subProtocol: ESubProtocol = ESubProtocol.SERIAL;
     public subProtocol: ESubProtocol = VBANSerialPacket.subProtocol;
     /**
      * This field is used to give possible information on COM port and serial transmission mode related

@@ -9,7 +9,7 @@ export class VBANTEXTPacket extends VBANPacket {
     /**
      * {@link VBANTEXTPacket.subProtocol}
      */
-    public static subProtocol: ESubProtocol = ESubProtocol.TEXT;
+    public static readonly subProtocol: ESubProtocol = ESubProtocol.TEXT;
     public subProtocol: ESubProtocol = VBANTEXTPacket.subProtocol;
     /**
      * Bit rate is given in bps for information only. But it can be used internally to limit the bandwidth of

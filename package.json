@@ -33,7 +33,8 @@
     "ci:generate:documentation": "typedoc",
     "ci:test:coverage": "jest --ci --coverage",
     "ci:eslint": "npm run lint -- -f json -o ./coverage/eslint-report.json",
-    "test": "jest"
+    "test": "jest",
+    "example:chat": "ts-node examples/chat.ts"
   },
   "author": {
     "email": "thib3113@gmail.com",
