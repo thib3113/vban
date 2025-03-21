@@ -5,8 +5,8 @@ import {
     EServicePINGFeatures,
     EServiceType,
     ESubProtocol,
-    VBANProtocolFactory,
-    VBANPingPacket
+    VBANPingPacket,
+    VBANProtocolFactory
 } from '../../src';
 
 describe('VBANPingPacket.test.ts', () => {

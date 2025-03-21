@@ -1,7 +1,14 @@
 import * as readline from 'readline';
-import { EServiceFunction, EServicePINGApplicationType, EServiceType, VBANPacketTypes, VBANServer } from '../src';
+import {
+    EServiceFunction,
+    EServicePINGApplicationType,
+    EServiceType,
+    VBANChatPacket,
+    VBANPacketTypes,
+    VBANPingPacket,
+    VBANServer
+} from '../src';
 import * as os from 'node:os';
-import { VBANPingPacket, VBANChatPacket } from '../src';
 import { RemoteInfo } from 'dgram';
 
 const rl = readline.createInterface({

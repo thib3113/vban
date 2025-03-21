@@ -10,11 +10,11 @@ import {
     IPacketPingData,
     MAX_FRAME_COUNTER,
     VBANPacket,
-    VBANPacketTypes
+    VBANPacketTypes,
+    VBANPingPacket
 } from './packets';
 import { VBANProtocolFactory } from './VBANProtocolFactory';
 import { IVBANServerOptions } from './IVBANServerOptions';
-import { VBANPingPacket } from './packets';
 import { promisify } from 'node:util';
 
 export interface VBANServerEvents {
@@ -103,7 +103,7 @@ export class VBANServer extends EventEmitter {
     public send(packet: VBANPacket, port: number, address: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             packet.frameCounter = this.getFrameCounter(packet.subProtocol);
-            this.UDPServer.send(VBANProtocolFactory.toUDPBuffer(packet), port, address, (error) => {
+            this.UDPServer.send(VBANProtocolFactory.toUDPBuffer(packet), port, address, (error: Error | null) => {
                 if (error) {
                     reject(error);
                     return;

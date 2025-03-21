@@ -1,6 +1,5 @@
-import { EServiceFunction, EServicePINGApplicationType, EServicePINGFeatures, EServiceType, VBANServer } from '../src';
+import { EServiceFunction, EServicePINGApplicationType, EServicePINGFeatures, EServiceType, VBANPingPacket, VBANServer } from '../src';
 import * as os from 'os';
-import { VBANPingPacket } from '../src';
 
 //disable autoReplyToPing, because we will do it manually
 const server = new VBANServer({ autoReplyToPing: false });

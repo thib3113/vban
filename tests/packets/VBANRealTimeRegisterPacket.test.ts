@@ -1,9 +1,6 @@
 import { Buffer } from 'buffer';
 import {
-    bufferToHex,
     EServiceFunction,
-    EServicePINGApplicationType,
-    EServicePINGFeatures,
     EServiceType,
     ESubProtocol,
     VBANProtocolFactory,

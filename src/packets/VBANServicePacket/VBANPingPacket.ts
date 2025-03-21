@@ -56,7 +56,7 @@ export class VBANPingPacket extends VBANServicePacket {
         const deviceName = cleanPacketString(getXNextBytes(64).toString('ascii'));
         const manufacturerName = cleanPacketString(getXNextBytes(64).toString('ascii'));
         const applicationName = cleanPacketString(getXNextBytes(64).toString('ascii'));
-        const hostname = cleanPacketString(getXNextBytes(64).toString('ascii'));
+        const hostnameASCII = cleanPacketString(getXNextBytes(64).toString('ascii'));
         const userName = cleanPacketString(getXNextBytes(128).toString('utf8'));
         const userComment = cleanPacketString(getXNextBytes(128).toString('utf8'));
 
@@ -79,7 +79,7 @@ export class VBANPingPacket extends VBANServicePacket {
             deviceName,
             manufacturerName,
             applicationName,
-            hostname,
+            hostname: hostnameASCII,
             userName,
             userComment
         };
