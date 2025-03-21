@@ -69,7 +69,7 @@ class Chat {
 
     private handlePing(packet: VBANPingPacket, sender: RemoteInfo) {
         if (this.remoteChatter && sender.address === this.remoteChatter.address) {
-            const username = packet.data.userName ?? packet.data.hostnameASCII ?? packet.data.deviceName;
+            const username = packet.data.userName ?? packet.data.hostname ?? packet.data.deviceName;
             console.log(`# receive ping from ${username} (${sender.address}:${sender.port})`);
 
             this.remoteChatter.username = username;

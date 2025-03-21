@@ -161,3 +161,4 @@ last-check.json
 badwords.json
 
 docs
+/src/debug.ts

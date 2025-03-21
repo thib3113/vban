@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { PACKET_IDENTIFICATION } from './commons';
-import { ESubProtocol, VBANAudioPacket, VBANSerialPacket, VBANServicePacket, VBANTEXTPacket, VBANServicePacketFactory } from './packets';
+import { ESubProtocol, VBANAudioPacket, VBANSerialPacket, VBANServicePacket, VBANServicePacketFactory, VBANTEXTPacket } from './packets';
 
 export class VBANProtocolFactory {
     public static processPacket(packet: Buffer): VBANAudioPacket | VBANSerialPacket | VBANTEXTPacket | VBANServicePacket {

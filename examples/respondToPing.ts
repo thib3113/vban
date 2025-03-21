@@ -14,7 +14,7 @@ server.on('message', (packet, sender) => {
     try {
         if (packet instanceof VBANPingPacket) {
             console.log(
-                `receive message from ${sender.address}:${sender.port} . Hostname : ${packet.data.hostnameASCII}, Device ${packet.data.deviceName}, Application ${packet.data.applicationName}, Language ${packet.data.langCode}`,
+                `receive message from ${sender.address}:${sender.port} . Hostname : ${packet.data.hostname}, Device ${packet.data.deviceName}, Application ${packet.data.applicationName}, Language ${packet.data.langCode}`,
                 JSON.stringify(packet)
             );
 
@@ -48,7 +48,7 @@ server.on('message', (packet, sender) => {
                     reservedEx: '',
                     reservedEx2: '',
                     deviceName: 'NodeJs Server',
-                    hostnameASCII: os.hostname(),
+                    hostname: os.hostname(),
                     userName: '',
                     userComment: ''
                 }

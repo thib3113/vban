@@ -56,7 +56,7 @@ export class VBANPingPacket extends VBANServicePacket {
         const deviceName = cleanPacketString(getXNextBytes(64).toString('ascii'));
         const manufacturerName = cleanPacketString(getXNextBytes(64).toString('ascii'));
         const applicationName = cleanPacketString(getXNextBytes(64).toString('ascii'));
-        const hostnameASCII = cleanPacketString(getXNextBytes(64).toString('ascii'));
+        const hostname = cleanPacketString(getXNextBytes(64).toString('ascii'));
         const userName = cleanPacketString(getXNextBytes(128).toString('utf8'));
         const userComment = cleanPacketString(getXNextBytes(128).toString('utf8'));
 
@@ -79,7 +79,7 @@ export class VBANPingPacket extends VBANServicePacket {
             deviceName,
             manufacturerName,
             applicationName,
-            hostnameASCII,
+            hostname,
             userName,
             userComment
         };
@@ -131,7 +131,7 @@ export class VBANPingPacket extends VBANServicePacket {
         offset += dataBuffer.write(prepareStringForPacket(packet.data.deviceName, 64), offset, 'ascii');
         offset += dataBuffer.write(prepareStringForPacket(packet.data.manufacturerName, 64), offset, 'ascii');
         offset += dataBuffer.write(prepareStringForPacket(packet.data.applicationName, 64), offset, 'ascii');
-        offset += dataBuffer.write(prepareStringForPacket(packet.data.hostnameASCII, 64), offset, 'ascii');
+        offset += dataBuffer.write(prepareStringForPacket(packet.data.hostname, 64), offset, 'ascii');
         offset += dataBuffer.write(prepareStringForPacket(packet.data.userName, 128), offset, 'utf8');
         dataBuffer.write(prepareStringForPacket(packet.data.userComment, 128), offset, 'utf8');
 

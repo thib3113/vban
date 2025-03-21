@@ -37,7 +37,7 @@ export interface IPacketPingData {
     /* Application Name */
     applicationName: string;
     /* Hostname, replace reservedLongASCII */
-    hostnameASCII: string;
+    hostname: string;
     /* User Name */
     userName: string;
     /* User Comment/ Mood/ Remark/ message */

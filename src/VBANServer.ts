@@ -117,7 +117,7 @@ export class VBANServer extends EventEmitter {
     public sendPing(receiver: { address: string; port: number }, isReply = false): Promise<void> {
         const frameCounter = this.getFrameCounter(ESubProtocol.SERVICE);
 
-        const defaultApp: Omit<IPacketPingData, 'hostnameASCII'> = {
+        const defaultApp: Omit<IPacketPingData, 'hostname'> = {
             applicationName: 'Test application',
             manufacturerName: 'Anonymous',
             applicationType: EServicePINGApplicationType.SERVER,
@@ -166,7 +166,7 @@ export class VBANServer extends EventEmitter {
                 reservedEx: application.reservedEx,
                 reservedEx2: application.reservedEx2,
                 deviceName: application.deviceName,
-                hostnameASCII: application.hostname ?? this.os.hostname(),
+                hostname: application.hostname ?? this.os.hostname(),
                 userName: application.userName,
                 userComment: application.userComment
             }
