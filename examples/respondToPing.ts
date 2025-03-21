@@ -1,12 +1,4 @@
-import {
-    VBANServer,
-    VBANServicePacket,
-    VBANProtocolFactory,
-    EServiceType,
-    EServiceFunction,
-    EServicePINGApplicationType,
-    EServicePINGFeatures
-} from '../src';
+import { EServiceFunction, EServicePINGApplicationType, EServicePINGFeatures, EServiceType, VBANPingPacket, VBANServer } from '../src';
 import * as os from 'os';
 
 //disable autoReplyToPing, because we will do it manually
@@ -19,13 +11,13 @@ server.on('error', (err) => {
 
 server.on('message', (packet, sender) => {
     try {
-        if (packet instanceof VBANServicePacket) {
+        if (packet instanceof VBANPingPacket) {
             console.log(
-                `receive message from ${sender.address}:${sender.port} . Hostname : ${packet.data.reservedLongASCII}, Device ${packet.data.deviceName}, Application ${packet.data.applicationName}, Language ${packet.data.langCode}`,
+                `receive message from ${sender.address}:${sender.port} . Hostname : ${packet.data.hostname}, Device ${packet.data.deviceName}, Application ${packet.data.applicationName}, Language ${packet.data.langCode}`,
                 JSON.stringify(packet)
             );
 
-            const newPacket = new VBANServicePacket(
+            const newPacket = new VBANPingPacket(
                 {
                     streamName: 'VBAN Service',
                     service: EServiceType.IDENTIFICATION,
@@ -55,7 +47,7 @@ server.on('message', (packet, sender) => {
                     reservedEx: '',
                     reservedEx2: '',
                     deviceName: 'NodeJs Server',
-                    reservedLongASCII: os.hostname(),
+                    hostname: os.hostname(),
                     userName: '',
                     userComment: ''
                 }

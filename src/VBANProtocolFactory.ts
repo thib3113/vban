@@ -1,11 +1,11 @@
 import { Buffer } from 'buffer';
 import { PACKET_IDENTIFICATION } from './commons';
-import { ESubProtocol, VBANAudioPacket, VBANSerialPacket, VBANServicePacket, VBANTEXTPacket } from './packets';
+import { ESubProtocol, VBANAudioPacket, VBANSerialPacket, VBANServicePacket, VBANServicePacketFactory, VBANTEXTPacket } from './packets';
 
 export class VBANProtocolFactory {
     public static processPacket(packet: Buffer): VBANAudioPacket | VBANSerialPacket | VBANTEXTPacket | VBANServicePacket {
-        const headerBuffer = packet.slice(0, 28);
-        const dataBuffer = packet.slice(28);
+        const headerBuffer = packet.subarray(0, 28);
+        const dataBuffer = packet.subarray(28);
 
         if (headerBuffer.toString('ascii', 0, PACKET_IDENTIFICATION.length) !== PACKET_IDENTIFICATION) {
             throw new Error('Invalid Header');
@@ -22,7 +22,7 @@ export class VBANProtocolFactory {
 
     public static getConstructor(
         protocol: ESubProtocol
-    ): typeof VBANAudioPacket | typeof VBANSerialPacket | typeof VBANTEXTPacket | typeof VBANServicePacket {
+    ): typeof VBANAudioPacket | typeof VBANSerialPacket | typeof VBANTEXTPacket | typeof VBANServicePacketFactory {
         switch (protocol) {
             case ESubProtocol.AUDIO:
                 return VBANAudioPacket;
@@ -31,7 +31,7 @@ export class VBANProtocolFactory {
             case ESubProtocol.TEXT:
                 return VBANTEXTPacket;
             case ESubProtocol.SERVICE:
-                return VBANServicePacket;
+                return VBANServicePacketFactory;
             default:
                 throw new Error(`unknown protocol ${protocol}`);
         }
@@ -46,7 +46,7 @@ export class VBANProtocolFactory {
         } else if (packet instanceof VBANTEXTPacket) {
             buffer = VBANTEXTPacket.toUDPPacket(packet);
         } else if (packet instanceof VBANServicePacket) {
-            buffer = VBANServicePacket.toUDPPacket(packet);
+            buffer = VBANServicePacketFactory.toUDPPacket(packet);
         } else {
             throw new Error('unknown packet instance');
         }

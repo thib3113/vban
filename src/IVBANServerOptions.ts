@@ -19,6 +19,7 @@ export interface IVBANServerOptions {
         deviceName?: string;
         userName?: string;
         userComment?: string;
+        hostname?: string;
     };
     /**
      * will auto send a reply when another app will send a ping

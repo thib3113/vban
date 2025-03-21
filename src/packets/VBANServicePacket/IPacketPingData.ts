@@ -1,7 +1,7 @@
 import { EServicePINGApplicationType } from './EServicePINGApplicationType';
 import { EServicePINGFeatures } from './EServicePINGFeatures';
 
-export interface IServicePing {
+export interface IPacketPingData {
     /* VBAN device type*/
     applicationType: EServicePINGApplicationType;
     /* VBAN features */
@@ -36,8 +36,8 @@ export interface IServicePing {
     manufacturerName: string;
     /* Application Name */
     applicationName: string;
-    /* unused must be zero */
-    reservedLongASCII: string;
+    /* Hostname, replace reservedLongASCII */
+    hostname: string;
     /* User Name */
     userName: string;
     /* User Comment/ Mood/ Remark/ message */

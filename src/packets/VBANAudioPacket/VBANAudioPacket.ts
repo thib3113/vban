@@ -10,7 +10,7 @@ export class VBANAudioPacket extends VBANPacket {
     /**
      * {@link VBANAudioPacket.subProtocol}
      */
-    public static subProtocol: ESubProtocol = ESubProtocol.AUDIO;
+    public static readonly subProtocol: ESubProtocol = ESubProtocol.AUDIO;
     public subProtocol: ESubProtocol = VBANAudioPacket.subProtocol;
     /**
      * Number of sample is given by an 8 bits unsigned integer (0 – 255) where 0 means 1 sample and

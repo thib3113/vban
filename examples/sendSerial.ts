@@ -1,4 +1,4 @@
-import { VBANServer, VBANSerialPacket, EFormatBit, sampleRates, ESerialStreamType } from '../src';
+import { EFormatBit, ESerialStreamType, VBANSerialPacket, VBANServer } from '../src';
 
 const server = new VBANServer();
 
@@ -19,8 +19,7 @@ server.on('listening', () => {
             formatBit: EFormatBit.VBAN_DATATYPE_BYTE8,
             frameCounter: 0,
             streamName: '',
-            streamType: ESerialStreamType.VBAN_SERIAL_MIDI,
-            sr: sampleRates[4]
+            streamType: ESerialStreamType.VBAN_SERIAL_MIDI
         },
         Buffer.from('b0036a', 'hex')
     );

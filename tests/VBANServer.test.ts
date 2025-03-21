@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import { EServiceType, ESubProtocol, MAX_FRAME_COUNTER, VBANPacket, VBANServicePacket } from '../src';
+import { EServiceType, ESubProtocol, MAX_FRAME_COUNTER, VBANPacket, VBANPingPacket } from '../src';
 // noinspection ES6PreferShortImport
 import { VBANServer } from '../src/VBANServer';
 
@@ -9,13 +9,13 @@ const toUDPBufferMock = jest.fn();
 jest.mock('../src/VBANProtocolFactory', () => {
     return {
         VBANProtocolFactory: {
-            processPacket: (...args: any) => processPacketMock(...args),
-            toUDPBuffer: (...args: any) => toUDPBufferMock(...args)
+            processPacket: (...args: Array<any>) => processPacketMock(...args),
+            toUDPBuffer: (...args: Array<any>) => toUDPBufferMock(...args)
         }
     };
 });
 
-jest.mock('../src/packets/VBANServicePacket/VBANServicePacket');
+jest.mock('../src/packets/VBANServicePacket/VBANPingPacket');
 
 const socketMock = {
     on: jest.fn(),
@@ -151,13 +151,19 @@ describe('VBANServer.test.ts', () => {
         });
     });
     describe('bind', () => {
-        it('should call udp.bind', () => {
-            socketMock.bind.mockImplementationOnce(() => ({ bar: 'foo' }));
+        it('should call udp.bind', async () => {
+            socketMock.bind.mockImplementationOnce((...args: Array<unknown>) => {
+                const last = args.pop();
+                if (typeof last === 'function') {
+                    last();
+                }
+            });
 
             const server = new VBANServer();
 
-            expect(server.bind()).toBe(server);
-            expect(socketMock.bind).toHaveBeenCalledWith();
+            expect(socketMock.bind).not.toHaveBeenCalled();
+            await server.bind();
+            expect(socketMock.bind).toHaveBeenCalled();
         });
     });
     describe('getFrameCounter', () => {
@@ -213,7 +219,7 @@ describe('VBANServer.test.ts', () => {
 
             server.send(packet, 6980, '127.0.0.1');
 
-            expect(socketMock.send).toHaveBeenCalledWith(udpPacket, 6980, '127.0.0.1');
+            expect(socketMock.send).toHaveBeenCalledWith(udpPacket, 6980, '127.0.0.1', expect.any(Function));
         });
     });
 
@@ -334,7 +340,7 @@ describe('VBANServer.test.ts', () => {
         });
 
         describe('autoReply', () => {
-            it('should autoReply to ping', () => {
+            it('should autoReply to ping', async () => {
                 const server = new VBANServer({
                     autoReplyToPing: true
                 });
@@ -342,7 +348,7 @@ describe('VBANServer.test.ts', () => {
                 const emitMock = jest.fn();
                 server.emit = emitMock;
                 // @ts-ignore
-                const packet = new VBANServicePacket({});
+                const packet = new VBANPingPacket({});
                 packet.service = EServiceType.IDENTIFICATION;
                 packet.isReply = false;
                 processPacketMock.mockImplementationOnce(() => packet);
@@ -352,7 +358,7 @@ describe('VBANServer.test.ts', () => {
                 const sender = { address: '127.0.0.1', port: 6980 };
                 const udpBuffer = Buffer.from('aaaaaaaaaaa');
                 // @ts-ignore
-                server.messageHandler(udpBuffer, sender);
+                await server.messageHandler(udpBuffer, sender);
                 expect(processPacketMock).toHaveBeenCalledWith(udpBuffer);
                 expect(emitMock).toHaveBeenCalledWith('message', packet, sender);
 
@@ -362,14 +368,20 @@ describe('VBANServer.test.ts', () => {
     });
 
     describe('close', () => {
-        it('should call close udp', () => {
+        it('should call close udp', async () => {
+            socketMock.close.mockImplementationOnce((...args: Array<unknown>) => {
+                const last = args.pop();
+                if (typeof last === 'function') {
+                    last();
+                }
+            });
+
             const server = new VBANServer();
 
-            const fn = () => true;
+            expect(socketMock.close).not.toHaveBeenCalled();
+            await server.close();
 
-            server.close(fn);
-
-            expect(socketMock.close).toHaveBeenCalledWith(fn);
+            expect(socketMock.close).toHaveBeenCalled();
         });
     });
 });

@@ -5,11 +5,11 @@ import {
     EServicePINGFeatures,
     EServiceType,
     ESubProtocol,
-    VBANProtocolFactory,
-    VBANServicePacket
+    VBANPingPacket,
+    VBANProtocolFactory
 } from '../../src';
 
-describe('VBANServicePacket.test.ts', () => {
+describe('VBANPingPacket.test.ts', () => {
     describe('from Buffer', () => {
         it('should handle basic convert buffer to packet', () => {
             const buffer = Buffer.from(
@@ -18,9 +18,9 @@ describe('VBANServicePacket.test.ts', () => {
             );
 
             const packet = VBANProtocolFactory.processPacket(buffer);
-            expect(packet).toBeInstanceOf(VBANServicePacket);
+            expect(packet).toBeInstanceOf(VBANPingPacket);
 
-            if (packet instanceof VBANServicePacket) {
+            if (packet instanceof VBANPingPacket) {
                 expect(packet.subProtocol).toBe(ESubProtocol.SERVICE);
                 //always 0 for a Service packet
                 expect(packet.sr).toBe(0);
@@ -62,7 +62,7 @@ describe('VBANServicePacket.test.ts', () => {
                 expect(data.deviceName).toBe('Windows PC');
                 expect(data.manufacturerName).toBe('VB-Audio Software');
                 expect(data.applicationName).toBe('Voicemeeter Potato');
-                expect(data.reservedLongASCII).toBe('hostname');
+                expect(data.hostname).toBe('hostname');
                 expect(data.userName).toBe('');
                 expect(data.userComment).toBe('');
             } else {
@@ -80,7 +80,7 @@ describe('VBANServicePacket.test.ts', () => {
                 VBANProtocolFactory.processPacket(buffer);
             } catch (e) {
                 expect(e).toBeInstanceOf(Error);
-                expect((e as Error).message).toBe('unknown service 20');
+                expect((e as Error).message).toBe('unknown protocol 20');
             }
         });
     });
@@ -115,13 +115,13 @@ describe('VBANServicePacket.test.ts', () => {
                 deviceName: 'Windows PC',
                 manufacturerName: 'VB-Audio Software',
                 applicationName: 'Voicemeeter Potato',
-                reservedLongASCII: 'hostname',
+                hostname: 'hostname',
                 userName: '',
                 userComment: ''
             }
         };
         it('should handle basic convert packet to buffer', () => {
-            const packet = new VBANServicePacket(basicPackages.headers, basicPackages.data);
+            const packet = new VBANPingPacket(basicPackages.headers, basicPackages.data);
 
             const buffer = VBANProtocolFactory.toUDPBuffer(packet);
             expect(buffer).toStrictEqual(
@@ -134,7 +134,7 @@ describe('VBANServicePacket.test.ts', () => {
     });
 
     it('decode / encode test', () => {
-        const packet = new VBANServicePacket(
+        const packet = new VBANPingPacket(
             {
                 streamName: 'VBAN Service',
                 frameCounter: 15,
@@ -164,7 +164,7 @@ describe('VBANServicePacket.test.ts', () => {
                 deviceName: 'Windows PC',
                 manufacturerName: 'VB-Audio Software',
                 applicationName: 'Voicemeeter Potato',
-                reservedLongASCII: 'hostname',
+                hostname: 'hostname',
                 userName: '',
                 userComment: ''
             }

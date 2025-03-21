@@ -26,9 +26,7 @@
 
 [![NPM](https://nodei.co/npm/vban.png)](https://nodei.co/npm/vban/)
 
-Implementation of the VBAN protocol in node.js ( rev 9, oct 2021 )
-
-https://www.vb-audio.com/Voicemeeter/VBANProtocol_Specifications.pdf
+Implementation of the [VBAN protocol](https://www.vb-audio.com/Voicemeeter/VBANProtocol_Specifications.pdf) in node.js ( [rev 11, Jan 2025](https://web.archive.org/web/20250124131008/https://vb-audio.com/Voicemeeter/VBANProtocol_Specifications.pdf) )
 
 ## Install
 ```
