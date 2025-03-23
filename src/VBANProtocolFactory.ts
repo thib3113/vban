@@ -3,6 +3,7 @@ import { PACKET_IDENTIFICATION } from './commons.js';
 import {
     ESubProtocol,
     VBANAudioPacket,
+    VBANPacket,
     VBANSerialPacket,
     VBANServicePacket,
     VBANServicePacketFactory,
@@ -44,19 +45,18 @@ export class VBANProtocolFactory {
         }
     }
 
-    public static toUDPBuffer(packet: VBANAudioPacket | VBANSerialPacket | VBANTEXTPacket | VBANServicePacket | unknown): Buffer {
-        let buffer: Buffer;
-        if (packet instanceof VBANAudioPacket) {
-            buffer = VBANAudioPacket.toUDPPacket(packet);
-        } else if (packet instanceof VBANSerialPacket) {
-            buffer = VBANSerialPacket.toUDPPacket(packet);
-        } else if (packet instanceof VBANTEXTPacket) {
-            buffer = VBANTEXTPacket.toUDPPacket(packet);
-        } else if (packet instanceof VBANServicePacket) {
-            buffer = VBANServicePacketFactory.toUDPPacket(packet);
-        } else {
-            throw new Error('unknown packet instance');
+    public static toUDPBuffer(packet: Pick<VBANPacket, 'subProtocol'>): Buffer {
+        switch (packet.subProtocol) {
+            case ESubProtocol.AUDIO:
+                return VBANAudioPacket.toUDPPacket(packet as VBANAudioPacket);
+            case ESubProtocol.SERIAL:
+                return VBANSerialPacket.toUDPPacket(packet as VBANSerialPacket);
+            case ESubProtocol.TEXT:
+                return VBANTEXTPacket.toUDPPacket(packet as VBANTEXTPacket);
+            case ESubProtocol.SERVICE:
+                return VBANServicePacketFactory.toUDPPacket(packet as VBANServicePacket);
+            default:
+                throw new Error('unknown packet instance');
         }
-        return buffer;
     }
 }

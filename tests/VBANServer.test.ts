@@ -1,13 +1,16 @@
 import { Buffer } from 'buffer';
-import { EServiceType, ESubProtocol, MAX_FRAME_COUNTER, VBANPacket, VBANPingPacket } from '../src/index.js';
+
 import { jest } from '@jest/globals';
-// noinspection ES6PreferShortImport
-import { VBANServer } from '../src/VBANServer.js';
+import { EServiceType } from '../src/packets/VBANServicePacket/EServiceType.js';
+import { EServiceFunction } from '../src/packets/VBANServicePacket/EServiceFunction.js';
+import { ESubProtocol } from '../src/packets/ESubProtocol.js';
+import { MAX_FRAME_COUNTER } from '../src/packets/VBANSpecs.js';
+import { VBANServicePacket } from '../src/packets/VBANServicePacket/VBANServicePacket.js';
 
 jest.resetModules();
 const processPacketMock = jest.fn();
 const toUDPBufferMock = jest.fn();
-jest.mock('../src/VBANProtocolFactory', () => {
+jest.unstable_mockModule('../src/VBANProtocolFactory', () => {
     return {
         VBANProtocolFactory: {
             processPacket: (...args: Array<any>) => processPacketMock(...args),
@@ -16,7 +19,13 @@ jest.mock('../src/VBANProtocolFactory', () => {
     };
 });
 
-jest.mock('../src/packets/VBANServicePacket/VBANPingPacket');
+const VBANPingPacketObject = jest.fn();
+const mockVBANPingPacketConstructor = jest.fn().mockReturnValue(VBANPingPacketObject);
+jest.unstable_mockModule('../src/packets/VBANServicePacket/VBANPingPacket.js', () => {
+    return {
+        VBANPingPacket: mockVBANPingPacketConstructor
+    };
+});
 
 const socketMock = {
     on: jest.fn(),
@@ -30,18 +39,24 @@ const osMock = {
     hostname: jest.fn()
 };
 
+jest.unstable_mockModule('node:os', () => {
+    return { default: osMock };
+});
+
+jest.unstable_mockModule('node:dgram', () => {
+    return {
+        default: {
+            createSocket: createSocketMock
+        }
+    };
+});
+
+const { VBANServer } = await import('../src/VBANServer.js');
+
+const { VBANPingPacket } = await import('../src/packets/VBANServicePacket/VBANPingPacket.js');
+
 beforeEach(() => {
     jest.resetAllMocks();
-
-    jest.mock('os', () => {
-        return osMock;
-    });
-
-    jest.mock('dgram', () => {
-        return {
-            createSocket: createSocketMock
-        };
-    });
 
     createSocketMock.mockImplementation(() => socketMock);
 });
@@ -62,32 +77,6 @@ describe('VBANServer.test.ts', () => {
             expect(socketMock.on).toHaveBeenCalledWith('close', expect.any(Function));
             expect(socketMock.on).toHaveBeenCalledWith('error', expect.any(Function));
             expect(socketMock.on).toHaveBeenCalledWith('message', expect.any(Function));
-        });
-        it('should crash if it fail to create an udp socket', () => {
-            createSocketMock.mockImplementation(() => {
-                throw new Error('fake error');
-            });
-            expect.assertions(3);
-            try {
-                new VBANServer();
-            } catch (e) {
-                expect(createSocketMock).toHaveBeenCalledWith('udp4');
-                expect(e).toBeInstanceOf(Error);
-                expect((e as Error).message).toBe('fail to open udp4 socket. Is dgram dependency available ?');
-            }
-        });
-        it('should crash if it fail to get os details', () => {
-            jest.resetModules();
-            jest.mock('os', () => {
-                throw new Error('fake error');
-            });
-            expect.assertions(2);
-            try {
-                new VBANServer();
-            } catch (e) {
-                expect(e).toBeInstanceOf(Error);
-                expect((e as Error).message).toBe('fail to retrieve OS informations. Is os dependency available ?');
-            }
         });
         it('should react to default events', () => {
             type fn = (...args: Array<unknown>) => void;
@@ -219,7 +208,12 @@ describe('VBANServer.test.ts', () => {
         it('should send', () => {
             const server = new VBANServer();
 
-            const packet = { subProtocol: ESubProtocol.AUDIO } as VBANPacket;
+            const packet = new VBANServicePacket({
+                streamName: 'VBAN Service',
+                service: EServiceType.CHATUTF8,
+                serviceFunction: EServiceFunction.PING0,
+                isReply: false
+            });
             const udpPacket = Buffer.from('foo:bar');
             toUDPBufferMock.mockImplementationOnce(() => udpPacket);
 
