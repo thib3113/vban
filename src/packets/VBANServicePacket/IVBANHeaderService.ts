@@ -1,6 +1,6 @@
-import { IVBANHeader } from '../IVBANHeader';
-import { EServiceType } from './EServiceType';
-import { EServiceFunction } from './EServiceFunction';
+import { IVBANHeader } from '../IVBANHeader.js';
+import { EServiceType } from './EServiceType.js';
+import { EServiceFunction } from './EServiceFunction.js';
 
 export interface IVBANHeaderService extends Omit<IVBANHeader, 'sp' | 'sr'> {
     service: EServiceType;

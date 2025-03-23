@@ -1,4 +1,4 @@
-import { VBANAudioPacket, VBANServer } from '../src';
+import { VBANAudioPacket, VBANServer } from '../src/index.js';
 
 //need to install "speaker" module
 import Speaker from 'speaker';

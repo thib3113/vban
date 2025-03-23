@@ -1,16 +1,18 @@
 root = true
 
 [*]
+indent_style = space
 end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 indent_size = 4
 
+[{*.ats,*.cts,*.mts,*.ts}]
+ij_typescript_use_explicit_js_extension = always_js
+
 [*.yml]
-indent_style = space
 indent_size = 2
 
-[*.json]
-indent_style = space
+[package.json]
 indent_size = 2

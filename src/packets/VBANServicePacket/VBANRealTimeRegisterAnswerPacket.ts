@@ -1,8 +1,8 @@
-import { VBANServicePacket } from './VBANServicePacket';
-import { IVBANHeaderService } from './IVBANHeaderService';
 import { Buffer } from 'buffer';
-import { EServiceType } from './EServiceType';
-import { IVBANHeaderCommon } from '../IVBANHeaderCommon';
+import { VBANServicePacket } from './VBANServicePacket.js';
+import { IVBANHeaderService } from './IVBANHeaderService.js';
+import { EServiceType } from './EServiceType.js';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
 
 export enum ERegistrationAnswer {
     /**

@@ -1,12 +1,12 @@
-import { VBANServicePacket } from './VBANServicePacket';
-import { IVBANHeaderService } from './IVBANHeaderService';
-import { IPacketPingData } from './IPacketPingData';
+import { VBANServicePacket } from './VBANServicePacket.js';
+import { IVBANHeaderService } from './IVBANHeaderService.js';
+import { IPacketPingData } from './IPacketPingData.js';
 import { Buffer } from 'buffer';
-import { EServiceType } from './EServiceType';
-import { EServicePINGApplicationType } from './EServicePINGApplicationType';
-import { EServicePINGFeatures } from './EServicePINGFeatures';
-import { cleanPacketString, prepareStringForPacket } from '../../commons';
-import { IVBANHeaderCommon } from '../IVBANHeaderCommon';
+import { EServiceType } from './EServiceType.js';
+import { EServicePINGApplicationType } from './EServicePINGApplicationType.js';
+import { EServicePINGFeatures } from './EServicePINGFeatures.js';
+import { cleanPacketString, prepareStringForPacket } from '../../commons.js';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
 
 export class VBANPingPacket extends VBANServicePacket {
     public data: IPacketPingData;

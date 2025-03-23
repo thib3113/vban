@@ -1,4 +1,4 @@
-import { EFormatBit, ESerialStreamType, VBANSerialPacket, VBANServer } from '../src';
+import { EFormatBit, ESerialStreamType, VBANSerialPacket, VBANServer } from '../src/index.js';
 
 const server = new VBANServer();
 

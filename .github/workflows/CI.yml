@@ -19,28 +19,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - uses: ./.github/actions/setup-node
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: yarn
-      - name: npm install, build, and test
-        run: |
-          yarn install
-          yarn build
-          echo start tests
-        env:
-          CI: true
+          NODE_VERSION: ${{ matrix.node-version }}
+
       - uses: mattallty/jest-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI: true
         with:
-          test-command: yarn run ci:test:coverage
+          test-command: pnpm run ci:test:coverage
           coverage-comment: false
-
-      - name: replace path in coverage files
-        run: find ./coverage -type f -exec sed -i -e "s@$(pwd)@<root>@g" {} \;
-        if: always()
 
       - uses: actions/upload-artifact@v4
         with:
@@ -59,19 +49,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: install eslint
-        run: npm install
+
+      - uses: ./.github/actions/setup-node
+
       - name: run eslint
         run: |
           echo start eslint
           mkdir coverage
-          npm run ci:eslint
+          pnpm run ci:eslint
         continue-on-error: true
         env:
           CI: true
-
-      - name: replace path in coverage files
-        run: find ./coverage -type f -exec sed -i -e "s@$(pwd)@<root>@g" {} \;
 
       - uses: actions/upload-artifact@v4
         with:
@@ -114,9 +102,6 @@ jobs:
         with:
           name: eslint-coverage
           path: ./coverage/
-
-      - name: change coverage path in file
-        run: find ./coverage -type f -exec sed -i -e "s@<root>@/github/workspace@g" {} \;
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5.0.0

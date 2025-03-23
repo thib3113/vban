@@ -1,9 +1,9 @@
-import { VBANServicePacket } from './VBANServicePacket';
-import { IVBANHeaderService } from './IVBANHeaderService';
+import { VBANServicePacket } from './VBANServicePacket.js';
+import { IVBANHeaderService } from './IVBANHeaderService.js';
+import { EServiceType } from './EServiceType.js';
+import { prepareStringForPacket } from '../../commons.js';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
 import { Buffer } from 'buffer';
-import { EServiceType } from './EServiceType';
-import { prepareStringForPacket } from '../../commons';
-import { IVBANHeaderCommon } from '../IVBANHeaderCommon';
 
 export class VBANChatPacket extends VBANServicePacket {
     public data: string;
@@ -17,8 +17,6 @@ export class VBANChatPacket extends VBANServicePacket {
         const fn = headers.part1;
         const serviceFunction = fn & 0b01111111;
         const isReply = (fn & 0b10000000) >= 1;
-
-        console.log(headers);
 
         return new VBANChatPacket(
             {

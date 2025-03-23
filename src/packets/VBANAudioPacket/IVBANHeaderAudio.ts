@@ -1,4 +1,4 @@
-import { IVBANHeader } from '../IVBANHeader';
+import { IVBANHeader } from '../IVBANHeader.js';
 
 export interface IVBANHeaderAudio extends Omit<IVBANHeader, 'sp'> {
     nbSample: number;

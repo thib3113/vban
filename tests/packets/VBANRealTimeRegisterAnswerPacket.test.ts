@@ -6,7 +6,7 @@ import {
     ESubProtocol,
     VBANProtocolFactory,
     VBANRealTimeRegisterAnswerPacket
-} from '../../src';
+} from '../../src/index.js';
 
 describe('VBANRealTimeRegisterAnswerPacket.test.ts', () => {
     describe('from Buffer', () => {

@@ -1,9 +1,9 @@
-import { VBANPacket } from '../VBANPacket';
-import { ESubProtocol } from '../ESubProtocol';
-import { EServiceType } from './EServiceType';
 import { Buffer } from 'buffer';
-import { IVBANHeaderService } from './IVBANHeaderService';
-import { EServiceFunction } from './EServiceFunction';
+import { VBANPacket } from '../VBANPacket.js';
+import { ESubProtocol } from '../ESubProtocol.js';
+import { EServiceType } from './EServiceType.js';
+import { IVBANHeaderService } from './IVBANHeaderService.js';
+import { EServiceFunction } from './EServiceFunction.js';
 
 export class VBANServicePacket extends VBANPacket {
     /**

@@ -1,3 +1,3 @@
-export * from './ETextEncoding';
-export * from './VBANTEXTPacket';
-export * from './IVBANHeaderTEXT';
+export * from './ETextEncoding.js';
+export * from './VBANTEXTPacket.js';
+export * from './IVBANHeaderTEXT.js';

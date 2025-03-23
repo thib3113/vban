@@ -1,9 +1,9 @@
-import { VBANServicePacket } from './VBANServicePacket';
-import { IVBANHeaderService } from './IVBANHeaderService';
 import { Buffer } from 'buffer';
-import { EServiceType } from './EServiceType';
-import { IVBANHeaderCommon } from '../IVBANHeaderCommon';
-import { VBANRealTimeRegisterAnswerPacket } from './VBANRealTimeRegisterAnswerPacket';
+import { VBANServicePacket } from './VBANServicePacket.js';
+import { IVBANHeaderService } from './IVBANHeaderService.js';
+import { EServiceType } from './EServiceType.js';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
+import { VBANRealTimeRegisterAnswerPacket } from './VBANRealTimeRegisterAnswerPacket.js';
 
 export interface IRealTimeRegisterPacket {
     /**

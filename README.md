@@ -8,6 +8,7 @@
 [![vban](https://snyk-widget.herokuapp.com/badge/npm/vban/badge.svg)](https://snyk.io/advisor/npm-package/vban)
 [![GitHub stars](https://img.shields.io/github/stars/thib3113/vban.svg?style=social&label=Star)](https://github.com/thib3113/vban/stargazers/)
 [![Package Quality](https://packagequality.com/shield/vban.svg)](https://packagequality.com/#?package=vban)
+[![Install size](https://flat.badgen.net/bundlephobia/min/vban)](https://bundlephobia.com/package/vban)
 
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=thib3113_vban&metric=bugs)](https://sonarcloud.io/dashboard?id=thib3113_vban)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=thib3113_vban&metric=code_smells)](https://sonarcloud.io/dashboard?id=thib3113_vban)
@@ -107,7 +108,7 @@ Functionalities in progress :
 - [X] Convert UDP packet to objects
 - [X] Convert Objects to UDP packet
 - [X] Start a VBAN Server, with configuration, and auto SERVICE replies
-- [ ] Implements RT-Packet Service
+- [X] Implements RT-Packet Service (but return a raw buffer)
 
 ## Thanks to
 This project is inspired by [node-VBAN](https://github.com/JMJBower/node-VBAN) from [Jacob Bower](https://github.com/JMJBower).

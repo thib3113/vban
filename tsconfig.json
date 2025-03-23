@@ -1,23 +1,20 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@tsconfig/node-lts",
+  "include": ["src", "tests"],
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2020",
-    "strict": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "lib": ["es2020", "dom", "esnext"],
-    "sourceMap": true,
-    "allowJs": true,
+    "outDir": "./lib",
     "esModuleInterop": true,
-    "strictNullChecks": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "sourceMap": true,
     "declaration": true,
-    "outDir": "lib"
+    "strict": true,
+    "typeRoots": ["./node_modules/@types"]
   },
-  "exclude": [
-    "node_modules",
-    "tests"
-  ],
-  "include": [
-    "src/**/*.ts"
-  ]
+  "exclude": ["node_modules", "build"],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }
