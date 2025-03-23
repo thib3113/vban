@@ -62,7 +62,7 @@
     "ci:generate:documentation": "typedoc",
     "jest": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
     "test:ci": "npm run jest -- --ci",
-    "test:ci:coverage": "npm run jest -- --ci --coverage",
+    "ci:test:coverage": "npm run jest -- --ci --coverage",
     "example:chat": "node --loader ts-node/esm examples/chat.ts"
   },
   "author": {
