@@ -3,6 +3,7 @@
   "extends": "@tsconfig/node-lts",
   "include": ["src", "tests"],
   "compilerOptions": {
+    "isolatedModules": true,
     "outDir": "./lib",
     "esModuleInterop": true,
     "module": "NodeNext",

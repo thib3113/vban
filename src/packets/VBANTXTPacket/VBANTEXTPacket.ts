@@ -67,7 +67,6 @@ export class VBANTEXTPacket extends VBANPacket {
             ? Buffer.from(packet.text, VBANTEXTPacket.getEncoding(packet.encoding))
             : (packet.dataBuffer ?? Buffer.from(''));
 
-        //search bpsId
         const bpsId =
             Number(
                 Object.entries(BITS_SPEEDS)
