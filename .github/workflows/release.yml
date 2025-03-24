@@ -7,18 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: yarn
 
-      - name: npm install, build
-        run: |
-          yarn install
-          yarn build
-          echo start tests
-        env:
-          CI: true
+      - uses: ./.github/actions/setup-node
       - uses: mattallty/jest-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
