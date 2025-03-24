@@ -14,7 +14,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI: true
         with:
-          test-command: yarn run ci:test:coverage
+          test-command: pnpm run ci:test:coverage
           coverage-comment: false
 
   deploy-npm:
