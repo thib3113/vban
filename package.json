@@ -54,7 +54,7 @@
     "start": "node src/debug.ts",
     "ts-types": "tsc -p tsconfig.build.json --emitDeclarationOnly --outDir lib/types",
     "build": "tsc --noEmit && rimraf lib && node esbuild.mjs && npm run ts-types",
-    "build:prod": "tsc -p tsconfig.build.json",
+    "build:prod": "tsc --noEmit && rimraf lib && node esbuild.mjs && npm run ts-types",
     "lint": "eslint --debug",
     "lint:fix": "npm run lint -- --fix",
     "ci:eslint": "npm run lint -- -f json -o ./coverage/eslint-report.json",
