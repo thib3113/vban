@@ -1,10 +1,10 @@
-import { VBANPacket } from '../VBANPacket';
-import { ESubProtocol } from '../ESubProtocol';
-import { EBitsResolutions } from './EBitsResolutions';
-import { ECodecs } from './ECodecs';
-import { IVBANHeaderAudio } from './IVBANHeaderAudio';
+import { VBANPacket } from '../VBANPacket.js';
+import { ESubProtocol } from '../ESubProtocol.js';
+import { EBitsResolutions } from './EBitsResolutions.js';
+import { ECodecs } from './ECodecs.js';
+import { IVBANHeaderAudio } from './IVBANHeaderAudio.js';
+import { IBitResolution } from './IBitResolution.js';
 import { Buffer } from 'buffer';
-import { IBitResolution } from './IBitResolution';
 
 export class VBANAudioPacket extends VBANPacket {
     /**

@@ -1,4 +1,11 @@
-import { EServiceFunction, EServicePINGApplicationType, EServicePINGFeatures, EServiceType, VBANPingPacket, VBANServer } from '../src';
+import {
+    EServiceFunction,
+    EServicePINGApplicationType,
+    EServicePINGFeatures,
+    EServiceType,
+    VBANPingPacket,
+    VBANServer
+} from '../src/index.js';
 import * as os from 'os';
 
 //disable autoReplyToPing, because we will do it manually

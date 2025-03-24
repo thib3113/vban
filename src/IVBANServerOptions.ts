@@ -1,4 +1,4 @@
-import { EServicePINGApplicationType, EServicePINGFeatures } from './packets';
+import { EServicePINGApplicationType, EServicePINGFeatures } from './packets/index.js';
 import { RemoteInfo } from 'dgram';
 
 export interface IVBANServerOptions {

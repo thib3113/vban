@@ -1,6 +1,6 @@
-import { IVBANHeader } from '../IVBANHeader';
-import { EFormatBit } from '../../commons';
-import { ETextEncoding } from './ETextEncoding';
+import { IVBANHeader } from '../IVBANHeader.js';
+import { EFormatBit } from '../../commons.js';
+import { ETextEncoding } from './ETextEncoding.js';
 
 export interface IVBANHeaderTEXT extends Omit<IVBANHeader, 'sp' | 'sr'> {
     bps?: number;

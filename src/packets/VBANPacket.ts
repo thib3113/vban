@@ -1,9 +1,9 @@
-import { ESubProtocol } from './ESubProtocol';
-import { IVBANHeaderCommon } from './IVBANHeaderCommon';
-import { cleanPacketString, PACKET_IDENTIFICATION, sampleRates, STREAM_NAME_LENGTH } from '../commons';
-import { IVBANHeader } from './IVBANHeader';
-import { VBAN_DATA_MAX_SIZE } from './VBANSpecs';
 import { Buffer } from 'buffer';
+import { ESubProtocol } from './ESubProtocol.js';
+import { IVBANHeaderCommon } from './IVBANHeaderCommon.js';
+import { cleanPacketString, PACKET_IDENTIFICATION, sampleRates, STREAM_NAME_LENGTH } from '../commons.js';
+import { IVBANHeader } from './IVBANHeader.js';
+import { VBAN_DATA_MAX_SIZE } from './VBANSpecs.js';
 
 export class VBANPacket {
     /**
@@ -112,11 +112,13 @@ export class VBANPacket {
             );
         }
 
-        return Buffer.concat([headersBuffer, data.slice(0, VBAN_DATA_MAX_SIZE)]);
+        return Buffer.concat([headersBuffer, data.subarray(0, VBAN_DATA_MAX_SIZE)]);
     }
 
     /**
      * EXPERIMENTAL - DO NOT USE
+     *
+     * @experimental
      */
     public static checkFrameCounter(headers: VBANPacket) {
         //check frameCounter

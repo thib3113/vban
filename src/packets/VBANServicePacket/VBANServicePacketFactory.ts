@@ -1,11 +1,11 @@
 import { Buffer } from 'buffer';
-import { VBANServicePacket } from './VBANServicePacket';
-import { EServiceType } from './EServiceType';
-import { VBANPacket } from '../VBANPacket';
-import { VBANPingPacket } from './VBANPingPacket';
-import { VBANChatPacket } from './VBANChatPacket';
-import { VBANRealTimeRegisterPacket } from './VBANRealTimeRegisterPacket';
-import { VBANRealTimePacket } from './VBANRealTimePacket';
+import { VBANServicePacket } from './VBANServicePacket.js';
+import { EServiceType } from './EServiceType.js';
+import { VBANPacket } from '../VBANPacket.js';
+import { VBANPingPacket } from './VBANPingPacket.js';
+import { VBANChatPacket } from './VBANChatPacket.js';
+import { VBANRealTimeRegisterPacket } from './VBANRealTimeRegisterPacket.js';
+import { VBANRealTimePacket } from './VBANRealTimePacket.js';
 
 export class VBANServicePacketFactory {
     public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANServicePacket {

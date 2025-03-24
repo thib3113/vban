@@ -1,4 +1,4 @@
-import type { BindOptions, RemoteInfo, Socket } from 'dgram';
+import dgram, { BindOptions, RemoteInfo, Socket } from 'node:dgram';
 import type { AddressInfo } from 'net';
 import { EventEmitter } from 'events';
 import {
@@ -12,10 +12,11 @@ import {
     VBANPacket,
     VBANPacketTypes,
     VBANPingPacket
-} from './packets';
-import { VBANProtocolFactory } from './VBANProtocolFactory';
-import { IVBANServerOptions } from './IVBANServerOptions';
+} from './packets/index.js';
+import { VBANProtocolFactory } from './VBANProtocolFactory.js';
+import { IVBANServerOptions } from './IVBANServerOptions.js';
 import { promisify } from 'node:util';
+import os from 'node:os';
 
 export interface VBANServerEvents {
     listening: () => void;
@@ -24,17 +25,14 @@ export interface VBANServerEvents {
     message: (packet: VBANPacketTypes, sender: RemoteInfo) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export declare interface VBANServer {
     on<U extends keyof VBANServerEvents>(event: U, listener: VBANServerEvents[U]): this;
 
     emit<U extends keyof VBANServerEvents>(event: U, ...args: Parameters<VBANServerEvents[U]>): boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class VBANServer extends EventEmitter {
     public readonly UDPServer: Socket;
-    private readonly os: { hostname: () => string };
     private readonly options: IVBANServerOptions;
 
     private readonly frameCounter: Map<ESubProtocol, number> = new Map<ESubProtocol, number>();
@@ -43,20 +41,7 @@ export class VBANServer extends EventEmitter {
 
     constructor(options?: IVBANServerOptions) {
         super();
-        //first check dependencies
-        try {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            this.UDPServer = require('dgram').createSocket('udp4');
-        } catch (e) {
-            throw new Error('fail to open udp4 socket. Is dgram dependency available ?');
-        }
-
-        try {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            this.os = require('os');
-        } catch (e) {
-            throw new Error('fail to retrieve OS informations. Is os dependency available ?');
-        }
+        this.UDPServer = dgram.createSocket('udp4');
 
         this.options = options || {};
         if (this.options.autoReplyToPing === undefined) {
@@ -166,7 +151,7 @@ export class VBANServer extends EventEmitter {
                 reservedEx: application.reservedEx,
                 reservedEx2: application.reservedEx2,
                 deviceName: application.deviceName,
-                hostname: application.hostname ?? this.os.hostname(),
+                hostname: application.hostname ?? os.hostname(),
                 userName: application.userName,
                 userComment: application.userComment
             }

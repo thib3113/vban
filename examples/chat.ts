@@ -7,7 +7,7 @@ import {
     VBANPacketTypes,
     VBANPingPacket,
     VBANServer
-} from '../src';
+} from '../src/index.js';
 import * as os from 'node:os';
 import { RemoteInfo } from 'dgram';
 

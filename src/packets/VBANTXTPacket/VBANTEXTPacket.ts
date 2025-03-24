@@ -1,9 +1,9 @@
-import { VBANPacket } from '../VBANPacket';
+import { VBANPacket } from '../VBANPacket.js';
 import { Buffer } from 'buffer';
-import { ESubProtocol } from '../ESubProtocol';
-import { BITS_SPEEDS, EFormatBit } from '../../commons';
-import { ETextEncoding } from './ETextEncoding';
-import { IVBANHeaderTEXT } from './IVBANHeaderTEXT';
+import { ESubProtocol } from '../ESubProtocol.js';
+import { BITS_SPEEDS, EFormatBit } from '../../commons.js';
+import { ETextEncoding } from './ETextEncoding.js';
+import { IVBANHeaderTEXT } from './IVBANHeaderTEXT.js';
 
 export class VBANTEXTPacket extends VBANPacket {
     /**
@@ -65,9 +65,8 @@ export class VBANTEXTPacket extends VBANPacket {
     public static toUDPPacket(packet: VBANTEXTPacket): Buffer {
         const data = packet.text
             ? Buffer.from(packet.text, VBANTEXTPacket.getEncoding(packet.encoding))
-            : packet.dataBuffer ?? Buffer.from('');
+            : (packet.dataBuffer ?? Buffer.from(''));
 
-        //search bpsId
         const bpsId =
             Number(
                 Object.entries(BITS_SPEEDS)

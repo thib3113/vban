@@ -1,4 +1,4 @@
-import { ESubProtocol } from './ESubProtocol';
+import { ESubProtocol } from './ESubProtocol.js';
 
 export interface IVBANHeader {
     sr: number;

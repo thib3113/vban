@@ -1,12 +1,16 @@
 import { Buffer } from 'buffer';
-import { EServiceType, ESubProtocol, MAX_FRAME_COUNTER, VBANPacket, VBANPingPacket } from '../src';
-// noinspection ES6PreferShortImport
-import { VBANServer } from '../src/VBANServer';
+
+import { jest } from '@jest/globals';
+import { EServiceType } from '../src/packets/VBANServicePacket/EServiceType.js';
+import { EServiceFunction } from '../src/packets/VBANServicePacket/EServiceFunction.js';
+import { ESubProtocol } from '../src/packets/ESubProtocol.js';
+import { MAX_FRAME_COUNTER } from '../src/packets/VBANSpecs.js';
+import { VBANServicePacket } from '../src/packets/VBANServicePacket/VBANServicePacket.js';
 
 jest.resetModules();
 const processPacketMock = jest.fn();
 const toUDPBufferMock = jest.fn();
-jest.mock('../src/VBANProtocolFactory', () => {
+jest.unstable_mockModule('../src/VBANProtocolFactory', () => {
     return {
         VBANProtocolFactory: {
             processPacket: (...args: Array<any>) => processPacketMock(...args),
@@ -15,7 +19,13 @@ jest.mock('../src/VBANProtocolFactory', () => {
     };
 });
 
-jest.mock('../src/packets/VBANServicePacket/VBANPingPacket');
+const VBANPingPacketObject = jest.fn();
+const mockVBANPingPacketConstructor = jest.fn().mockReturnValue(VBANPingPacketObject);
+jest.unstable_mockModule('../src/packets/VBANServicePacket/VBANPingPacket.js', () => {
+    return {
+        VBANPingPacket: mockVBANPingPacketConstructor
+    };
+});
 
 const socketMock = {
     on: jest.fn(),
@@ -29,18 +39,24 @@ const osMock = {
     hostname: jest.fn()
 };
 
+jest.unstable_mockModule('node:os', () => {
+    return { default: osMock };
+});
+
+jest.unstable_mockModule('node:dgram', () => {
+    return {
+        default: {
+            createSocket: createSocketMock
+        }
+    };
+});
+
+const { VBANServer } = await import('../src/VBANServer.js');
+
+const { VBANPingPacket } = await import('../src/packets/VBANServicePacket/VBANPingPacket.js');
+
 beforeEach(() => {
     jest.resetAllMocks();
-
-    jest.mock('os', () => {
-        return osMock;
-    });
-
-    jest.mock('dgram', () => {
-        return {
-            createSocket: createSocketMock
-        };
-    });
 
     createSocketMock.mockImplementation(() => socketMock);
 });
@@ -62,46 +78,24 @@ describe('VBANServer.test.ts', () => {
             expect(socketMock.on).toHaveBeenCalledWith('error', expect.any(Function));
             expect(socketMock.on).toHaveBeenCalledWith('message', expect.any(Function));
         });
-        it('should crash if it fail to create an udp socket', () => {
-            createSocketMock.mockImplementation(() => {
-                throw new Error('fake error');
-            });
-            expect.assertions(3);
-            try {
-                new VBANServer();
-            } catch (e) {
-                expect(createSocketMock).toHaveBeenCalledWith('udp4');
-                expect(e).toBeInstanceOf(Error);
-                expect((e as Error).message).toBe('fail to open udp4 socket. Is dgram dependency available ?');
-            }
-        });
-        it('should crash if it fail to get os details', () => {
-            jest.resetModules();
-            jest.mock('os', () => {
-                throw new Error('fake error');
-            });
-            expect.assertions(2);
-            try {
-                new VBANServer();
-            } catch (e) {
-                expect(e).toBeInstanceOf(Error);
-                expect((e as Error).message).toBe('fail to retrieve OS informations. Is os dependency available ?');
-            }
-        });
         it('should react to default events', () => {
             type fn = (...args: Array<unknown>) => void;
             let listeningFn: fn, closeFn: fn, errorFn: fn;
 
             [...new Array(3)].forEach(() => {
+                // @ts-ignore
                 socketMock.on.mockImplementationOnce((event: string, fn) => {
                     switch (event) {
                         case 'listening':
+                            // @ts-ignore
                             listeningFn = fn;
                             break;
                         case 'error':
+                            // @ts-ignore
                             errorFn = fn;
                             break;
                         case 'close':
+                            // @ts-ignore
                             closeFn = fn;
                     }
                 });
@@ -113,6 +107,7 @@ describe('VBANServer.test.ts', () => {
             expect(socketMock.on).toHaveBeenCalledWith('close', expect.any(Function));
             expect(socketMock.on).toHaveBeenCalledWith('error', expect.any(Function));
 
+            // @ts-ignore
             server.emit = jest.fn();
 
             // @ts-ignore
@@ -213,7 +208,12 @@ describe('VBANServer.test.ts', () => {
         it('should send', () => {
             const server = new VBANServer();
 
-            const packet = { subProtocol: ESubProtocol.AUDIO } as VBANPacket;
+            const packet = new VBANServicePacket({
+                streamName: 'VBAN Service',
+                service: EServiceType.CHATUTF8,
+                serviceFunction: EServiceFunction.PING0,
+                isReply: false
+            });
             const udpPacket = Buffer.from('foo:bar');
             toUDPBufferMock.mockImplementationOnce(() => udpPacket);
 
@@ -236,6 +236,7 @@ describe('VBANServer.test.ts', () => {
             //set frameCounter
             // @ts-ignore
             server.getFrameCounter = getFrameCounterMock;
+            // @ts-ignore
             server.send = sendMock;
 
             getFrameCounterMock.mockImplementationOnce(() => 126);
@@ -247,6 +248,7 @@ describe('VBANServer.test.ts', () => {
             expect(server.send).toHaveBeenCalledWith(expect.anything(), 6980, '127.0.0.1');
 
             const packet = (server.send as jest.Mock).mock.calls[0][0];
+            // @ts-ignore
             const construct = packet.constructor as jest.Mock;
             expect(construct).toHaveBeenCalledWith(
                 { frameCounter: 126, isReply: false, service: 0, serviceFunction: 0, streamName: 'VBAN Service' },
@@ -283,6 +285,7 @@ describe('VBANServer.test.ts', () => {
             });
 
             const emitMock = jest.fn();
+            // @ts-ignore
             server.emit = emitMock;
             const packet = { bar: 'foo' };
             processPacketMock.mockImplementationOnce(() => packet);
@@ -301,10 +304,12 @@ describe('VBANServer.test.ts', () => {
                 const beforeProcessMock = jest.fn().mockReturnValue(false);
                 const server = new VBANServer({
                     autoReplyToPing: false,
+                    // @ts-ignore
                     beforeProcessPacket: beforeProcessMock
                 });
 
                 const emitMock = jest.fn();
+                // @ts-ignore
                 server.emit = emitMock;
 
                 const sender = { address: '127.0.0.1', port: 6980 };
@@ -320,10 +325,12 @@ describe('VBANServer.test.ts', () => {
                 const beforeProcessMock = jest.fn().mockReturnValue(true);
                 const server = new VBANServer({
                     autoReplyToPing: false,
+                    // @ts-ignore
                     beforeProcessPacket: beforeProcessMock
                 });
 
                 const emitMock = jest.fn();
+                // @ts-ignore
                 server.emit = emitMock;
                 const packet = { bar: 'foo2' };
                 processPacketMock.mockImplementationOnce(() => packet);
@@ -346,6 +353,7 @@ describe('VBANServer.test.ts', () => {
                 });
 
                 const emitMock = jest.fn();
+                // @ts-ignore
                 server.emit = emitMock;
                 // @ts-ignore
                 const packet = new VBANPingPacket({});
@@ -353,6 +361,7 @@ describe('VBANServer.test.ts', () => {
                 packet.isReply = false;
                 processPacketMock.mockImplementationOnce(() => packet);
                 const sendPingMock = jest.fn();
+                // @ts-ignore
                 server.sendPing = sendPingMock;
 
                 const sender = { address: '127.0.0.1', port: 6980 };

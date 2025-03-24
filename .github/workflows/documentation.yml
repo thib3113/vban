@@ -18,17 +18,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: yarn
-      - name: npm install, build, and test
+
+      - uses: ./.github/actions/setup-node
+
+      - name: Generate documentation
         run: |
-          yarn install
-          yarn run ci:generate:documentation
+          pnpm run ci:generate:documentation
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs

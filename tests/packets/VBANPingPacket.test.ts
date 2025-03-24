@@ -7,7 +7,7 @@ import {
     ESubProtocol,
     VBANPingPacket,
     VBANProtocolFactory
-} from '../../src';
+} from '../../src/index.js';
 
 describe('VBANPingPacket.test.ts', () => {
     describe('from Buffer', () => {

@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import { EBitsResolutions, ECodecs, ESubProtocol, sampleRates, VBANAudioPacket, VBANProtocolFactory } from '../../src';
+import { EBitsResolutions, ECodecs, ESubProtocol, sampleRates, VBANAudioPacket, VBANProtocolFactory } from '../../src/index.js';
 
 describe('VBANAudioPacket.test.ts', () => {
     const soundBuffer = Buffer.from([

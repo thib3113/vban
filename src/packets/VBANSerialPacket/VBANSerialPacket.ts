@@ -1,9 +1,9 @@
-import { VBANPacket } from '../VBANPacket';
-import { ESubProtocol } from '../ESubProtocol';
-import { BITS_SPEEDS, EFormatBit, serialStopModes } from '../../commons';
-import { ISerialBitMode } from './ISerialBitMode';
-import { ESerialStreamType } from './ESerialStreamType';
-import { IVBANHeaderSerial } from './IVBANHeaderSerial';
+import { VBANPacket } from '../VBANPacket.js';
+import { ESubProtocol } from '../ESubProtocol.js';
+import { BITS_SPEEDS, EFormatBit, serialStopModes } from '../../commons.js';
+import { ISerialBitMode } from './ISerialBitMode.js';
+import { ESerialStreamType } from './ESerialStreamType.js';
+import { IVBANHeaderSerial } from './IVBANHeaderSerial.js';
 import { Buffer } from 'buffer';
 
 export class VBANSerialPacket extends VBANPacket {

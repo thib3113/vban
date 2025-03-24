@@ -1,10 +1,12 @@
 // Implementation of the VBAN protocol
 // https://www.vb-audio.com/Voicemeeter/VBANProtocol_Specifications.pdf
 
-export * from './packets';
+export * from './packets/index.js';
 
-export * from './commons';
-export * from './VBANProtocolFactory';
+export * from './commons.js';
+export * from './VBANProtocolFactory.js';
 
-export * from './IVBANServerOptions';
-export * from './VBANServer';
+export * from './IVBANServerOptions.js';
+export * from './VBANServer.js';
+
+export * from './pkg.js';

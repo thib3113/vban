@@ -1,5 +1,5 @@
-import { EServicePINGApplicationType } from './EServicePINGApplicationType';
-import { EServicePINGFeatures } from './EServicePINGFeatures';
+import { EServicePINGApplicationType } from './EServicePINGApplicationType.js';
+import { EServicePINGFeatures } from './EServicePINGFeatures.js';
 
 export interface IPacketPingData {
     /* VBAN device type*/

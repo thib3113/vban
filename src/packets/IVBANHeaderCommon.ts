@@ -1,4 +1,4 @@
-import { IVBANHeader } from './IVBANHeader';
+import type { IVBANHeader } from './IVBANHeader.js';
 
 export interface IVBANHeaderCommon extends IVBANHeader {
     part1: number;

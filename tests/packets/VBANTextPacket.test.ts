@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import { BITS_SPEEDS, EFormatBit, ESubProtocol, ETextEncoding, VBANProtocolFactory, VBANTEXTPacket } from '../../src';
+import { BITS_SPEEDS, EFormatBit, ESubProtocol, ETextEncoding, VBANProtocolFactory, VBANTEXTPacket } from '../../src/index.js';
 
 describe('VBANTextPacket.test.ts', () => {
     describe('from Buffer', () => {
