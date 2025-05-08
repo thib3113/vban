@@ -31,8 +31,8 @@
     "@tsconfig/node14": "14.1.3",
     "@types/jest": "29.5.14",
     "@types/node": "22.14.1",
-    "@typescript-eslint/eslint-plugin": "8.30.0",
-    "@typescript-eslint/parser": "8.28.0",
+    "@typescript-eslint/eslint-plugin": "8.32.0",
+    "@typescript-eslint/parser": "8.32.0",
     "dotenv": "16.5.0",
     "esbuild": "0.25.2",
     "eslint": "9.24.0",
@@ -47,7 +47,7 @@
     "ts-node": "10.9.2",
     "typedoc": "0.28.1",
     "typescript": "5.8.2",
-    "typescript-eslint": "8.30.1"
+    "typescript-eslint": "8.32.0"
   },
   "scripts": {
     "debug": "tsc && node --enable-source-maps ./lib/debug.js",
