@@ -47,7 +47,7 @@
     "ts-node": "10.9.2",
     "typedoc": "0.28.1",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.30.1"
+    "typescript-eslint": "8.44.0"
   },
   "scripts": {
     "debug": "tsc && node --enable-source-maps ./lib/debug.js",
