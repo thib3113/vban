@@ -1,4 +1,4 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { VBANServicePacket } from './VBANServicePacket.js';
 import { EServiceType } from './EServiceType.js';
 import { VBANPacket } from '../VBANPacket.js';
@@ -17,7 +17,13 @@ export class VBANServicePacketFactory {
 
     private static getConstructor(
         protocol: EServiceType
-    ): typeof VBANPingPacket | typeof VBANChatPacket | typeof VBANRealTimeRegisterPacket | typeof VBANRealTimePacket {
+    ):
+        | undefined
+        | typeof VBANPingPacket
+        | typeof VBANChatPacket
+        | typeof VBANRealTimeRegisterPacket
+        | typeof VBANRealTimePacket
+        | typeof VBANRequestReplyPacket {
         switch (protocol) {
             case EServiceType.IDENTIFICATION:
                 return VBANPingPacket;

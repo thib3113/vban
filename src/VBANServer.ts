@@ -1,5 +1,6 @@
 import dgram, { BindOptions, RemoteInfo, Socket } from 'node:dgram';
 import type { AddressInfo } from 'net';
+import type { Buffer } from 'node:buffer';
 import { EventEmitter } from 'events';
 import {
     EServiceFunction,
@@ -177,7 +178,7 @@ export class VBANServer extends EventEmitter {
     };
 
     public async close() {
-        await promisify(this.UDPServer.close)();
+        await promisify(this.UDPServer.close.bind(this.UDPServer))();
         this.emit('close');
     }
 }

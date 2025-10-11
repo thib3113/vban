@@ -1,5 +1,5 @@
 import { VBANPacket } from '../VBANPacket.js';
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { ESubProtocol } from '../ESubProtocol.js';
 import { BITS_SPEEDS, EFormatBit } from '../../commons.js';
 import { ETextEncoding } from './ETextEncoding.js';

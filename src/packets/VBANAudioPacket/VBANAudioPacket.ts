@@ -4,7 +4,7 @@ import { EBitsResolutions } from './EBitsResolutions.js';
 import { ECodecs } from './ECodecs.js';
 import { IVBANHeaderAudio } from './IVBANHeaderAudio.js';
 import { IBitResolution } from './IBitResolution.js';
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 export class VBANAudioPacket extends VBANPacket {
     /**
@@ -104,7 +104,7 @@ export class VBANAudioPacket extends VBANPacket {
         );
     }
 
-    public static bitResolutions: Record<number, IBitResolution> = {
+    public static readonly bitResolutions: Record<number, IBitResolution> = {
         0: { bitDepth: 8, signed: false, float: false },
         1: { bitDepth: 16, signed: true, float: false },
         2: { bitDepth: 24, signed: true, float: false },

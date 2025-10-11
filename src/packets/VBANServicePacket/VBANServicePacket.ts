@@ -1,4 +1,4 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { VBANPacket } from '../VBANPacket.js';
 import { ESubProtocol } from '../ESubProtocol.js';
 import { EServiceType } from './EServiceType.js';

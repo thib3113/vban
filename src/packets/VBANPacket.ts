@@ -1,4 +1,4 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { ESubProtocol } from './ESubProtocol.js';
 import { IVBANHeaderCommon } from './IVBANHeaderCommon.js';
 import { cleanPacketString, PACKET_IDENTIFICATION, sampleRates, STREAM_NAME_LENGTH } from '../commons.js';

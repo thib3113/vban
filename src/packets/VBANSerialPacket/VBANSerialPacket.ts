@@ -4,7 +4,7 @@ import { BITS_SPEEDS, EFormatBit, serialStopModes } from '../../commons.js';
 import { ISerialBitMode } from './ISerialBitMode.js';
 import { ESerialStreamType } from './ESerialStreamType.js';
 import { IVBANHeaderSerial } from './IVBANHeaderSerial.js';
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 export class VBANSerialPacket extends VBANPacket {
     /**

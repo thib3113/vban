@@ -1,4 +1,4 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 import { jest } from '@jest/globals';
 import { EServiceType } from '../src/packets/VBANServicePacket/EServiceType.js';
@@ -53,7 +53,7 @@ jest.unstable_mockModule('node:dgram', () => {
 
 const { VBANServer } = await import('../src/VBANServer.js');
 
-const { VBANPingPacket } = await import('../src/packets/VBANServicePacket/VBANPingPacket.js');
+const { VBANPingPacket } = await import('../src/packets/VBANServicePacket/subPackets/VBANPingPacket.js');
 
 beforeEach(() => {
     jest.resetAllMocks();

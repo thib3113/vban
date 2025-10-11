@@ -1,9 +1,9 @@
-import { VBANServicePacket } from './VBANServicePacket.js';
-import { IVBANHeaderService } from './IVBANHeaderService.js';
-import { EServiceType } from './EServiceType.js';
-import { prepareStringForPacket } from '../../commons.js';
-import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
-import { Buffer } from 'buffer';
+import { VBANServicePacket } from '../VBANServicePacket.js';
+import { IVBANHeaderService } from '../IVBANHeaderService.js';
+import { EServiceType } from '../EServiceType.js';
+import { prepareStringForPacket } from '../../../commons.js';
+import { IVBANHeaderCommon } from '../../IVBANHeaderCommon.js';
+import { Buffer } from 'node:buffer';
 
 export class VBANChatPacket extends VBANServicePacket {
     public data: string;
