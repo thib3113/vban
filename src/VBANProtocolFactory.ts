@@ -1,17 +1,20 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { PACKET_IDENTIFICATION } from './commons.js';
 import {
     ESubProtocol,
     VBANAudioPacket,
+    VBANFramePacket,
     VBANPacket,
     VBANSerialPacket,
     VBANServicePacket,
     VBANServicePacketFactory,
     VBANTEXTPacket
 } from './packets/index.js';
+import type { VBANPacketTypes } from './packets/index.js';
+import { VBANUnknownPacket } from './packets/VBANUnknownPacket/VBANUnknownPacket.js';
 
 export class VBANProtocolFactory {
-    public static processPacket(packet: Buffer): VBANAudioPacket | VBANSerialPacket | VBANTEXTPacket | VBANServicePacket {
+    public static processPacket(packet: Buffer): VBANPacketTypes {
         const headerBuffer = packet.subarray(0, 28);
         const dataBuffer = packet.subarray(28);
 
@@ -25,12 +28,24 @@ export class VBANProtocolFactory {
         // first 3 bits only
         const subProtocol: ESubProtocol = header1 & 0b11100000;
 
-        return VBANProtocolFactory.getConstructor(subProtocol).fromUDPPacket(headerBuffer, dataBuffer);
+        let objectPacket = VBANProtocolFactory.getConstructor(subProtocol)?.fromUDPPacket(headerBuffer, dataBuffer);
+
+        if (objectPacket) {
+            return objectPacket;
+        }
+
+        return VBANUnknownPacket.fromUDPPacket(headerBuffer, dataBuffer);
     }
 
     public static getConstructor(
         protocol: ESubProtocol
-    ): typeof VBANAudioPacket | typeof VBANSerialPacket | typeof VBANTEXTPacket | typeof VBANServicePacketFactory {
+    ):
+        | undefined
+        | typeof VBANAudioPacket
+        | typeof VBANSerialPacket
+        | typeof VBANTEXTPacket
+        | typeof VBANServicePacketFactory
+        | typeof VBANFramePacket {
         switch (protocol) {
             case ESubProtocol.AUDIO:
                 return VBANAudioPacket;
@@ -40,8 +55,10 @@ export class VBANProtocolFactory {
                 return VBANTEXTPacket;
             case ESubProtocol.SERVICE:
                 return VBANServicePacketFactory;
+            case ESubProtocol.FRAME:
+                return VBANFramePacket;
             default:
-                throw new Error(`unknown protocol ${protocol}`);
+                return undefined;
         }
     }
 
@@ -55,6 +72,8 @@ export class VBANProtocolFactory {
                 return VBANTEXTPacket.toUDPPacket(packet as VBANTEXTPacket);
             case ESubProtocol.SERVICE:
                 return VBANServicePacketFactory.toUDPPacket(packet as VBANServicePacket);
+            case ESubProtocol.FRAME:
+                return VBANFramePacket.toUDPPacket(packet as VBANFramePacket);
             default:
                 throw new Error('unknown packet instance');
         }
