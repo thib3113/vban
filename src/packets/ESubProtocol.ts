@@ -1,7 +1,13 @@
 //sub protocols
 export enum ESubProtocol {
-    AUDIO = 0x00,
-    SERIAL = 0x20,
-    TEXT = 0x40,
-    SERVICE = 0x60
+    // specific, not handled by VBAN
+    UNKNOWN = -1,
+    // 0x00
+    AUDIO = 0,
+    // 0x20
+    SERIAL = 32,
+    // 0x40
+    TEXT = 64,
+    // 0x60
+    SERVICE = 96
 }

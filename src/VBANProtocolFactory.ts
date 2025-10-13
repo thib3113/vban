@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import { PACKET_IDENTIFICATION } from './commons.js';
+import type { VBANPacketTypes } from './packets/index.js';
 import {
     ESubProtocol,
     VBANAudioPacket,
@@ -9,31 +9,19 @@ import {
     VBANServicePacketFactory,
     VBANTEXTPacket
 } from './packets/index.js';
-import type { VBANPacketTypes } from './packets/index.js';
 import { VBANUnknownPacket } from './packets/VBANUnknownPacket/index.js';
 
 export class VBANProtocolFactory {
     public static processPacket(packet: Buffer): VBANPacketTypes {
-        const headerBuffer = packet.subarray(0, 28);
-        const dataBuffer = packet.subarray(28);
+        const { headers, data } = VBANPacket.parsePacket(packet);
 
-        if (headerBuffer.toString('ascii', 0, PACKET_IDENTIFICATION.length) !== PACKET_IDENTIFICATION) {
-            throw new Error('Invalid Header');
-        }
-
-        // SR / Sub protocol (5 + 3 bits)
-        const header1 = headerBuffer.readUInt8(PACKET_IDENTIFICATION.length);
-
-        // first 3 bits only
-        const subProtocol: ESubProtocol = header1 & 0b11100000;
-
-        let objectPacket = VBANProtocolFactory.getConstructor(subProtocol)?.fromUDPPacket(headerBuffer, dataBuffer);
+        let objectPacket = VBANProtocolFactory.getConstructor(headers.sp)?.fromUDPPacket(headers, data);
 
         if (objectPacket) {
             return objectPacket;
         }
 
-        return VBANUnknownPacket.fromUDPPacket(headerBuffer, dataBuffer);
+        return VBANUnknownPacket.fromUDPPacket(headers, data);
     }
 
     public static getConstructor(

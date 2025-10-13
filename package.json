@@ -25,17 +25,17 @@
     }
   },
   "devDependencies": {
-    "@eslint/js": "9.36.0",
+    "@eslint/js": "9.37.0",
     "@jest/globals": "30.2.0",
     "@tsconfig/node-lts": "22.0.2",
     "@tsconfig/node14": "14.1.5",
     "@types/jest": "30.0.0",
-    "@types/node": "24.6.2",
-    "@typescript-eslint/eslint-plugin": "8.45.0",
-    "@typescript-eslint/parser": "8.45.0",
+    "@types/node": "24.7.2",
+    "@typescript-eslint/eslint-plugin": "8.46.0",
+    "@typescript-eslint/parser": "8.46.0",
     "dotenv": "17.2.3",
     "esbuild": "0.25.10",
-    "eslint": "9.36.0",
+    "eslint": "9.37.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
     "eslint-plugin-tsdoc": "0.4.0",
@@ -43,11 +43,11 @@
     "jest-sonar": "0.2.16",
     "prettier": "3.6.2",
     "rimraf": "6.0.1",
-    "ts-jest": "29.4.4",
+    "ts-jest": "29.4.5",
     "ts-node": "10.9.2",
-    "typedoc": "0.28.13",
+    "typedoc": "0.28.14",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.45.0"
+    "typescript-eslint": "8.46.0"
   },
   "scripts": {
     "debug": "tsc -p tsconfig.build.json && node --enable-source-maps ./lib/debug.js",

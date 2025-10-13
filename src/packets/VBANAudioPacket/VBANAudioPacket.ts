@@ -5,6 +5,7 @@ import { ECodecs } from './ECodecs.js';
 import { IVBANHeaderAudio } from './IVBANHeaderAudio.js';
 import { IBitResolution } from './IBitResolution.js';
 import { Buffer } from 'node:buffer';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
 
 export class VBANAudioPacket extends VBANPacket {
     /**
@@ -74,8 +75,7 @@ export class VBANAudioPacket extends VBANPacket {
         );
     }
 
-    public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANAudioPacket {
-        const headers = this.prepareFromUDPPacket(headersBuffer);
+    public static fromUDPPacket(headers: IVBANHeaderCommon, dataBuffer: Buffer): VBANAudioPacket {
         const nbSample = headers.part1 + 1;
         const nbChannel = headers.part2 + 1;
 
@@ -91,6 +91,8 @@ export class VBANAudioPacket extends VBANPacket {
         if (!ECodecs[codec]) {
             throw new Error(`unknown codec ${codec}`);
         }
+
+        headers.sr = this.getSampleRate(headers.srIndex);
 
         return new VBANAudioPacket(
             {

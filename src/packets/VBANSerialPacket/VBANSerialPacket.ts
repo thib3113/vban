@@ -5,6 +5,7 @@ import { ISerialBitMode } from './ISerialBitMode.js';
 import { ESerialStreamType } from './ESerialStreamType.js';
 import { IVBANHeaderSerial } from './IVBANHeaderSerial.js';
 import { Buffer } from 'node:buffer';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
 
 export class VBANSerialPacket extends VBANPacket {
     /**
@@ -107,9 +108,7 @@ export class VBANSerialPacket extends VBANPacket {
         );
     }
 
-    public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANSerialPacket {
-        const headers = this.prepareFromUDPPacket(headersBuffer, false);
-
+    public static fromUDPPacket(headers: IVBANHeaderCommon, dataBuffer: Buffer): VBANSerialPacket {
         if (headers.srIndex === undefined || BITS_SPEEDS[headers.srIndex] === undefined) {
             throw new Error(`unknown bits speed ${headers.srIndex}`);
         }

@@ -16,6 +16,8 @@ export class VBANUnknownPacket extends VBANPacket {
     constructor(headers: IVBANHeaderCommon, data: Buffer) {
         super(headers);
 
+        this.subProtocol = headers.sp ?? this.subProtocol;
+
         this.part1 = headers.part1;
         this.part2 = headers.part2;
         this.part3 = headers.part3;
@@ -43,8 +45,7 @@ export class VBANUnknownPacket extends VBANPacket {
         );
     }
 
-    public static fromUDPPacket(headersBuffer: Buffer, data: Buffer): VBANUnknownPacket {
-        const headers = VBANPacket.prepareFromUDPPacket(headersBuffer);
+    public static fromUDPPacket(headers: IVBANHeaderCommon, data: Buffer): VBANUnknownPacket {
         return new VBANUnknownPacket(headers, data);
     }
 }

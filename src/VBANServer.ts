@@ -23,7 +23,7 @@ export interface VBANServerEvents {
     listening: () => void;
     error: (err: Error) => void;
     close: () => void;
-    message: (packet: VBANPacketTypes, sender: RemoteInfo) => void;
+    message: (packet: VBANPacketTypes, sender: RemoteInfo, message: Buffer) => void;
 }
 
 export declare interface VBANServer {
@@ -45,9 +45,7 @@ export class VBANServer extends EventEmitter {
         this.UDPServer = dgram.createSocket('udp4');
 
         this.options = options || {};
-        if (this.options.autoReplyToPing === undefined) {
-            this.options.autoReplyToPing = true;
-        }
+        this.options.autoReplyToPing ??= true;
 
         //listen to server messages
         this.UDPServer.on('listening', (...args) => {
@@ -174,7 +172,7 @@ export class VBANServer extends EventEmitter {
         if (this.options.autoReplyToPing && packet instanceof VBANPingPacket && !packet.isReply) {
             await this.sendPing(sender, true);
         }
-        this.emit('message', packet, sender);
+        this.emit('message', packet, sender, msg);
     };
 
     public async close() {

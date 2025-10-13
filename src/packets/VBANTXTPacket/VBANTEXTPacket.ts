@@ -4,6 +4,7 @@ import { ESubProtocol } from '../ESubProtocol.js';
 import { BITS_SPEEDS, EFormatBit } from '../../commons.js';
 import { ETextEncoding } from './ETextEncoding.js';
 import { IVBANHeaderTEXT } from './IVBANHeaderTEXT.js';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
 
 export class VBANTEXTPacket extends VBANPacket {
     /**
@@ -89,9 +90,7 @@ export class VBANTEXTPacket extends VBANPacket {
         );
     }
 
-    public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer) {
-        const headers = this.prepareFromUDPPacket(headersBuffer);
-
+    public static fromUDPPacket(headers: IVBANHeaderCommon, dataBuffer: Buffer) {
         if (headers.srIndex === undefined || BITS_SPEEDS[headers.srIndex] === undefined) {
             throw new Error(`unknown bits speed ${headers.srIndex}`);
         }

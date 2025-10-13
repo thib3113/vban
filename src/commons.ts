@@ -2,6 +2,10 @@ import { Buffer } from 'node:buffer';
 
 export const PACKET_IDENTIFICATION = 'VBAN';
 
+export const SUB_PROTOCOL_MASK = 0b11100000;
+
+export const HEADER_LENGTH = 28;
+
 /**
  * the stream name is limited to 16 bytes
  */
