@@ -1,8 +1,10 @@
 import { Worker, isMainThread, parentPort } from 'worker_threads';
-import { VBANServer, VBANPacketTypes } from '../src/index.js';
+import { VBANServer, VBANPacketTypes, bufferToHex } from '../src/index.js';
 import type { RemoteInfo } from 'node:dgram';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import console from 'node:console';
+import { Buffer } from 'node:buffer';
 
 /**
  * This example allow to log messages received from the server
@@ -11,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 const BIND_PORT = 7000;
 /**
  * Defines the logging style for incoming packets.
- * @type {'summary' | 'detailed' | 'base64'}
+ * @type {'summary' | 'detailed' | 'base64' | 'binary'}
  */
 const LOGGING_MODE = 'detailed';
 
@@ -37,6 +39,8 @@ if (isMainThread) {
         if (typeof message === 'string') {
             console.log(message);
         } else if (message && message.packet) {
+            const binary = bufferToHex(Buffer.from(message.base64Packet, 'base64'));
+
             switch (LOGGING_MODE) {
                 // @ts-ignore
                 case 'detailed':
@@ -44,12 +48,17 @@ if (isMainThread) {
                     console.log(`Packet Type: ${message.packetType}`);
                     console.log(`From: ${message.sender.address}:${message.sender.port}`);
                     console.dir(message.packet, { depth: null });
+                    console.log(binary);
                     console.log('-------------------------------------------');
                     break;
 
                 // @ts-ignore
                 case 'base64':
                     console.log(`${message.packetType}(${message.packet.frameCounter}) : ${message.base64Packet}`);
+                    break;
+                // @ts-ignore
+                case 'binary':
+                    console.log(`${message.packetType}(${message.packet.frameCounter}) : ${binary}`);
                     break;
 
                 // @ts-ignore
