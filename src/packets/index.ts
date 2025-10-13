@@ -2,8 +2,7 @@ import type { VBANAudioPacket } from './VBANAudioPacket/index.js';
 import type { VBANSerialPacket } from './VBANSerialPacket/index.js';
 import type { VBANTEXTPacket } from './VBANTXTPacket/index.js';
 import type { VBANServicePacket } from './VBANServicePacket/index.js';
-import type { VBANFramePacket } from './VBANFramePacket/index.js';
-import type { VBANUnknownPacket } from './VBANUnknownPacket/VBANUnknownPacket.js';
+import type { VBANUnknownPacket } from './VBANUnknownPacket/index.js';
 
 export * from './VBANAudioPacket/index.js';
 export * from './VBANSerialPacket/index.js';

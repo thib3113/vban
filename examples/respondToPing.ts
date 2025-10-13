@@ -6,7 +6,7 @@ import {
     VBANPingPacket,
     VBANServer
 } from '../src/index.js';
-import * as os from 'os';
+import * as os from 'node:os';
 
 //disable autoReplyToPing, because we will do it manually
 const server = new VBANServer({ autoReplyToPing: false });

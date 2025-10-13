@@ -106,11 +106,11 @@ export class VBANPingPacket extends VBANServicePacket {
 
         offset = dataBuffer.writeUInt32LE(packet.data.applicationType, offset);
         let features = 0;
-        packet.data.features.forEach((feature) => {
+        for (const feature of packet.data.features) {
             if (EServicePINGFeatures[feature]) {
                 features = features | feature;
             }
-        });
+        }
         offset = dataBuffer.writeUInt32LE(features, offset);
         offset = dataBuffer.writeUInt32LE(packet.data.bitFeatureEx, offset);
         offset = dataBuffer.writeUInt32LE(packet.data.PreferredRate, offset);

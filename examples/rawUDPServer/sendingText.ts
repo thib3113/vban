@@ -1,5 +1,5 @@
-import dgram from 'dgram';
-import { EFormatBit, ETextEncoding, VBANTEXTPacket } from '../../src';
+import dgram from 'node:dgram';
+import { EFormatBit, ETextEncoding, VBANTEXTPacket } from '../../src/index.js';
 
 const server = dgram.createSocket('udp4');
 

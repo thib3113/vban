@@ -1,5 +1,5 @@
-import dgram from 'dgram';
-import { VBANAudioPacket, VBANProtocolFactory } from '../../src';
+import dgram from 'node:dgram';
+import { VBANAudioPacket, VBANProtocolFactory } from '../../src/index.js';
 
 //need to install "speaker" module
 import Speaker from 'speaker';
@@ -32,9 +32,9 @@ server.on('message', (msg, sender) => {
             const newConfig = headerToSpeakerConfig(packet);
 
             let configMatch = true;
-            Object.keys(currentConfig || {}).forEach((element) => {
-                configMatch = configMatch && currentConfig[element] == newConfig[element];
-            });
+            for (const config of Object.keys(currentConfig || {})) {
+                configMatch = configMatch && currentConfig[config] == newConfig[config];
+            }
 
             if (!speaker || !configMatch) {
                 speaker = new Speaker({ ...newConfig });

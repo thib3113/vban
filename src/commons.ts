@@ -109,7 +109,7 @@ export function dec2bin(dec: number) {
 
 export function bufferToHex(buffer: Buffer) {
     if (!Buffer.isBuffer(buffer)) {
-        throw new Error('need to be a buffer');
+        throw new TypeError('need to be a buffer');
     }
 
     let hexString = '';

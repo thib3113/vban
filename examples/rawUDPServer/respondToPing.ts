@@ -1,4 +1,4 @@
-import dgram from 'dgram';
+import dgram from 'node:dgram';
 import {
     EServiceFunction,
     EServicePINGApplicationType,
@@ -6,8 +6,8 @@ import {
     EServiceType,
     VBANPingPacket,
     VBANProtocolFactory
-} from '../../src';
-import * as os from 'os';
+} from '../../src/index.js';
+import * as os from 'node:os';
 
 const server = dgram.createSocket('udp4');
 

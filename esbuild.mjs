@@ -1,7 +1,7 @@
 import esbuild from 'esbuild';
-import path from 'path';
-import fs from 'fs';
-import * as url from 'url';
+import path from 'node:path';
+import fs from 'node:fs';
+import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
