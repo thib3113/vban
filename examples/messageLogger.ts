@@ -1,7 +1,5 @@
-import { Worker, isMainThread, parentPort } from 'worker_threads';
-import { VBANServer, VBANPacketTypes, bufferToHex } from '../src/index.js';
-import type { RemoteInfo } from 'node:dgram';
-import path from 'node:path';
+import { Worker, isMainThread, parentPort } from 'node:worker_threads';
+import { VBANServer, bufferToHex } from '../src/index.js';
 import { fileURLToPath } from 'node:url';
 import console from 'node:console';
 import { Buffer } from 'node:buffer';
@@ -18,8 +16,6 @@ const BIND_PORT = 7000;
 const LOGGING_MODE = 'detailed';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const OUTPUT_DIR = path.join(__dirname, 'output_frames');
 
 // =================================================================
 // MAIN THREAD LOGIC (aka "Console Thread")
@@ -126,7 +122,7 @@ if (isMainThread) {
     });
 
     // The 'message' event now also provides the raw buffer as the third argument.
-    server.on('message', (packet: VBANPacketTypes, sender: RemoteInfo, rawBuffer: Buffer) => {
+    server.on('message', (packet, sender, rawBuffer) => {
         const serializablePacket = JSON.parse(JSON.stringify(packet));
         const packetType = packet.constructor.name;
         const base64Packet = rawBuffer.toString('base64');

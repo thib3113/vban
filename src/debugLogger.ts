@@ -4,7 +4,10 @@
  * This allows 'debug' to be an optional peer dependency.
  */
 import type { Debugger } from 'debug';
+import { createRequire } from 'node:module';
 import { pkg } from './pkg.js';
+
+const require2 = require ?? createRequire(import.meta.url);
 
 const mockDebug: Debugger = () => () => {};
 
@@ -19,9 +22,7 @@ mockDebug.destroy = () => true;
 let debugInstance;
 
 try {
-    // We attempt to dynamically import the 'debug' module.
-    // In ESM, dynamic import() returns a promise with the module's exports.
-    const debugModule = await import('debug');
+    const debugModule = require2('debug');
 
     debugInstance = debugModule.default(pkg.name);
 } catch (error) {
