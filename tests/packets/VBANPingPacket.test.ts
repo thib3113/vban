@@ -5,9 +5,12 @@ import {
     EServicePINGFeatures,
     EServiceType,
     ESubProtocol,
+    VBANPacket,
     VBANPingPacket,
-    VBANProtocolFactory
+    VBANProtocolFactory,
+    VBANUnknownPacket
 } from '../../src/index.js';
+import { expect } from '@jest/globals';
 
 describe('VBANPingPacket.test.ts', () => {
     describe('from Buffer', () => {
@@ -76,7 +79,7 @@ describe('VBANPingPacket.test.ts', () => {
             );
 
             const packet = VBANProtocolFactory.processPacket(buffer);
-            console.log(packet);
+            expect(packet).toBeInstanceOf(VBANUnknownPacket);
         });
     });
     describe('from packet', () => {

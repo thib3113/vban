@@ -7,7 +7,7 @@ import type { Debugger } from 'debug';
 import { createRequire } from 'node:module';
 import { pkg } from './pkg.js';
 
-const require2 = require ?? createRequire(import.meta.url);
+const require2 = typeof require === 'undefined' ? createRequire(import.meta.url) : require;
 
 const mockDebug: Debugger = () => () => {};
 

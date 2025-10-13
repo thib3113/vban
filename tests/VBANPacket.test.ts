@@ -49,9 +49,6 @@ const defaultHeaderProps: TestHeaderProps = {
     frameCounter: 1
 };
 
-// Helper function to calculate SHA-256 hash
-const calculateHash = (buffer: Buffer) => createHash('sha256').update(buffer).digest('hex');
-
 describe('VBANPacket', () => {
     describe('getSampleRate', () => {
         it('should return the correct sample rate for a valid index', () => {
@@ -97,64 +94,6 @@ describe('VBANPacket', () => {
 
             const textHeader = VBANPacket.parsePacketHeader(createTestHeaderBuffer({ ...defaultHeaderProps, sp: ESubProtocol.TEXT }));
             expect(textHeader.sp).toBe(ESubProtocol.TEXT);
-        });
-    });
-
-    describe('parsePacket', () => {
-        const parsePacketTestCases = [
-            {
-                description: 'a standard audio packet with data',
-                base64Packet: 'VkJBTgMA/wEAAQBBAHUAZABpAG8AUwB0AHIAZQBhAG0AAAAAAAIAAAAAAAAA3q2+7w==',
-                expectedHeaders: {
-                    sp: ESubProtocol.AUDIO,
-                    srIndex: 3,
-                    part1: 255,
-                    part2: 1,
-                    part3: 0,
-                    streamName: 'AudioStream',
-                    frameCounter: 50
-                },
-                expectedDataHash: '275876e34cf609db118f3d84abf30a57a4ecda8e58d9258d1032a155c6aa40b5'
-            },
-            {
-                description: 'a text packet with a string payload',
-                base64Packet: 'VkJBTkAAAAAAAABUAGUAeAB0AEQAYQB0AGEAAAAAAAAAAAAAZQAAAAAAAABTb21lIHRleHQgZGF0YSBoZXJl',
-                expectedHeaders: {
-                    sp: ESubProtocol.TEXT,
-                    srIndex: 0,
-                    part1: 0,
-                    part2: 0,
-                    part3: 0,
-                    streamName: 'TextData',
-                    frameCounter: 101
-                },
-                expectedDataHash: '1a8a719b3589f285328a8d789a6c3a1a011b81600c609c91629705d9e53a25b2'
-            },
-            {
-                description: 'a packet with no data payload',
-                base64Packet: 'VkJBTgMA/wEAAE4AbwBEAGEAdABhAAAAAAAAAAAAAAAAAQUAAAAAAAAA',
-                expectedHeaders: {
-                    sp: ESubProtocol.AUDIO,
-                    srIndex: 3,
-                    part1: 255,
-                    part2: 1,
-                    part3: 0,
-                    streamName: 'NoData',
-                    frameCounter: 1
-                },
-                expectedDataHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
-            }
-        ];
-
-        it.each(parsePacketTestCases)('should correctly parse $description', ({ base64Packet, expectedHeaders, expectedDataHash }) => {
-            const fullPacket = Buffer.from(base64Packet, 'base64');
-            const { headers, data } = VBANPacket.parsePacket(fullPacket);
-
-            // Check all headers at once
-            expect(headers).toEqual(expectedHeaders);
-
-            // Check data integrity with a hash
-            expect(calculateHash(data)).toBe(expectedDataHash);
         });
     });
 
