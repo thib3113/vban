@@ -18,6 +18,7 @@ import { VBANProtocolFactory } from './VBANProtocolFactory.js';
 import { IVBANServerOptions } from './IVBANServerOptions.js';
 import { promisify } from 'node:util';
 import os from 'node:os';
+import { createDebugger } from './debugLogger.js';
 
 export interface VBANServerEvents {
     listening: () => void;
@@ -32,6 +33,7 @@ export declare interface VBANServer {
     emit<U extends keyof VBANServerEvents>(event: U, ...args: Parameters<VBANServerEvents[U]>): boolean;
 }
 
+const debug = createDebugger('VBANServer');
 export class VBANServer extends EventEmitter {
     public readonly UDPServer: Socket;
     private readonly options: IVBANServerOptions;
@@ -86,8 +88,10 @@ export class VBANServer extends EventEmitter {
 
     public send(packet: VBANPacket, port: number, address: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
+            debug('Start sending packet ');
             packet.frameCounter = this.getFrameCounter(packet.subProtocol);
             this.UDPServer.send(VBANProtocolFactory.toUDPBuffer(packet), port, address, (error: Error | null) => {
+                debug('packet send');
                 if (error) {
                     reject(error);
                     return;

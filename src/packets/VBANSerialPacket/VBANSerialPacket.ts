@@ -64,6 +64,10 @@ export class VBANSerialPacket extends VBANPacket {
         this.sr = 0;
     }
 
+    public toUDPPacket(): ReturnType<(typeof VBANSerialPacket)['toUDPPacket']> {
+        return VBANSerialPacket.toUDPPacket(this);
+    }
+
     public static toUDPPacket(packet: VBANSerialPacket): Buffer {
         let part1 = 0;
 

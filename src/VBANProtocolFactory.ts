@@ -10,18 +10,27 @@ import {
     VBANTEXTPacket
 } from './packets/index.js';
 import { VBANUnknownPacket } from './packets/VBANUnknownPacket/index.js';
+import { createDebugger } from './debugLogger.js';
+import { randomBytes } from 'node:crypto';
 
+const debug = createDebugger('VBANProtocolFactory');
 export class VBANProtocolFactory {
     public static processPacket(packet: Buffer): VBANPacketTypes {
+        const localDebug = debug.extend(randomBytes(1).toString('hex'));
+        localDebug('start processPacket');
         const { headers, data } = VBANPacket.parsePacket(packet);
 
-        let objectPacket = VBANProtocolFactory.getConstructor(headers.sp)?.fromUDPPacket(headers, data);
+        try {
+            let objectPacket = VBANProtocolFactory.getConstructor(headers.sp)?.fromUDPPacket(headers, data);
 
-        if (objectPacket) {
-            return objectPacket;
+            if (objectPacket) {
+                return objectPacket;
+            }
+
+            return VBANUnknownPacket.fromUDPPacket(headers, data);
+        } finally {
+            localDebug('end processPacket');
         }
-
-        return VBANUnknownPacket.fromUDPPacket(headers, data);
     }
 
     public static getConstructor(
@@ -42,17 +51,23 @@ export class VBANProtocolFactory {
     }
 
     public static toUDPBuffer(packet: Pick<VBANPacket, 'subProtocol'>): Buffer {
-        switch (packet.subProtocol) {
-            case ESubProtocol.AUDIO:
-                return VBANAudioPacket.toUDPPacket(packet as VBANAudioPacket);
-            case ESubProtocol.SERIAL:
-                return VBANSerialPacket.toUDPPacket(packet as VBANSerialPacket);
-            case ESubProtocol.TEXT:
-                return VBANTEXTPacket.toUDPPacket(packet as VBANTEXTPacket);
-            case ESubProtocol.SERVICE:
-                return VBANServicePacketFactory.toUDPPacket(packet as VBANServicePacket);
-            default:
-                throw new Error('unknown packet instance');
+        const localDebug = debug.extend(randomBytes(1).toString('hex'));
+        localDebug('start converting to UDP');
+        try {
+            switch (packet.subProtocol) {
+                case ESubProtocol.AUDIO:
+                    return VBANAudioPacket.toUDPPacket(packet as VBANAudioPacket);
+                case ESubProtocol.SERIAL:
+                    return VBANSerialPacket.toUDPPacket(packet as VBANSerialPacket);
+                case ESubProtocol.TEXT:
+                    return VBANTEXTPacket.toUDPPacket(packet as VBANTEXTPacket);
+                case ESubProtocol.SERVICE:
+                    return VBANServicePacketFactory.toUDPPacket(packet as VBANServicePacket);
+                default:
+                    throw new Error('unknown packet instance');
+            }
+        } finally {
+            localDebug('end converting to UDP');
         }
     }
 }

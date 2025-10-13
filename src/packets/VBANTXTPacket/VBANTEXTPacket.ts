@@ -63,6 +63,10 @@ export class VBANTEXTPacket extends VBANPacket {
         this.sr = 0;
     }
 
+    public toUDPPacket(): ReturnType<(typeof VBANTEXTPacket)['toUDPPacket']> {
+        return VBANTEXTPacket.toUDPPacket(this);
+    }
+
     public static toUDPPacket(packet: VBANTEXTPacket): Buffer {
         const data = packet.text
             ? Buffer.from(packet.text, VBANTEXTPacket.getEncoding(packet.encoding))

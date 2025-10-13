@@ -28,13 +28,13 @@ export class VBANPacket {
     public static readonly frameCounters: Map<string, number> = new Map<string, number>();
 
     public static getSampleRate(srIndex?: number): number {
-        if (!srIndex || !sampleRates.hasOwnProperty(srIndex) || sampleRates[srIndex] === undefined) {
+        if (srIndex === undefined || srIndex === null || !sampleRates.hasOwnProperty(srIndex) || sampleRates[srIndex] === undefined) {
             throw new Error(`unknown sample rate ${srIndex}`);
         }
         return sampleRates[srIndex];
     }
 
-    public static parsePacketHeader(headersBuffer: Buffer, checkSR = true): IVBANHeaderCommon {
+    public static parsePacketHeader(headersBuffer: Buffer): IVBANHeaderCommon {
         const headers: Partial<IVBANHeaderCommon> = {};
 
         if (headersBuffer.toString('ascii', 0, PACKET_IDENTIFICATION.length) !== PACKET_IDENTIFICATION) {
@@ -67,17 +67,14 @@ export class VBANPacket {
         return headers as IVBANHeaderCommon;
     }
 
-    public static parsePacket(
-        packet: Buffer,
-        checkSR = true
-    ): {
+    public static parsePacket(packet: Buffer): {
         headers: IVBANHeaderCommon;
         data: Buffer;
     } {
         const headerBuffer = packet.subarray(0, HEADER_LENGTH);
         const dataBuffer = packet.subarray(HEADER_LENGTH);
 
-        const headers = this.parsePacketHeader(headerBuffer, checkSR);
+        const headers = this.parsePacketHeader(headerBuffer);
 
         return {
             headers,
@@ -90,7 +87,12 @@ export class VBANPacket {
      * @deprecated
      */
     public static prepareFromUDPPacket(headersBuffer: Buffer, checkSR = true): IVBANHeaderCommon {
-        return this.parsePacketHeader(headersBuffer, checkSR);
+        const headers = this.parsePacketHeader(headersBuffer);
+        if (checkSR) {
+            headers.sr = this.getSampleRate(headers.srIndex);
+        }
+
+        return headers;
     }
 
     /**
@@ -118,20 +120,20 @@ export class VBANPacket {
         bufferStart += PACKET_IDENTIFICATION.length;
         headersBuffer.fill(PACKET_IDENTIFICATION, bufferStart - PACKET_IDENTIFICATION.length, bufferStart, 'ascii');
 
-        let rate = sampleRate ?? 0;
-        if (sampleRate === undefined) {
-            //search sampleRate
-            rate = Number(
-                Object.entries(sampleRates)
-                    .find(([, sr]) => sr && sr === headers.sr)
-                    ?.shift()
-            );
-            if (!rate) {
+        let rateIndex: number;
+        if (sampleRate !== undefined) {
+            rateIndex = sampleRate;
+        } else if (headers.sr === 0) {
+            rateIndex = 0;
+        } else {
+            const foundEntry = Object.entries(sampleRates).find(([, srValue]) => srValue === headers.sr);
+            if (!foundEntry) {
                 throw new Error(`fail to find index for sample rate ${headers.sr}`);
             }
+            rateIndex = Number(foundEntry[0]);
         }
 
-        headersBuffer.fill((rate & 0b00011111) | (headers.sp & 0b11100000), bufferStart++);
+        headersBuffer.fill((rateIndex & 0b00011111) | (headers.sp & 0b11100000), bufferStart++);
 
         headersBuffer.fill(headers.part1, bufferStart++);
         headersBuffer.fill(headers.part2, bufferStart++);

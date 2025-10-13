@@ -60,6 +60,10 @@ export class VBANAudioPacket extends VBANPacket {
         this.data = data;
     }
 
+    public toUDPPacket(): ReturnType<(typeof VBANAudioPacket)['toUDPPacket']> {
+        return VBANAudioPacket.toUDPPacket(this);
+    }
+
     public static toUDPPacket(packet: VBANAudioPacket): Buffer {
         return this.convertToUDPPacket(
             {
