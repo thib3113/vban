@@ -1,0 +1,67 @@
+name: Performance Benchmarks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  deployments: write
+
+jobs:
+  benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [ lts/*]
+
+    name: Run performance benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+        with:
+          NODE_VERSION: ${{ matrix.node-version }}
+
+      - name: Restore benchmark baseline from main branch
+        # This step downloads the .github/.cache/bench.json file from the last successful run on the main branch
+        uses: actions/cache/restore@v4
+        with:
+          path: .github/.cache/bench.json
+          key: ${{ runner.os }}-benchmark-main
+          # Add a lookup-only key to ensure we get the latest from main
+          lookup-only: true
+
+      - name: Run benchmark
+        run: node bench.js
+
+      - name: Post benchmark summary as a PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('benchmarks/benchmark-summary.md', 'utf8');
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: summary
+            });
+
+      - name: Update benchmark baseline
+        # This step only runs for pushes to the main branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "Updating benchmark baseline on main branch..."
+          node bench.js --update-cache
+
+      - name: Commit and push baseline update
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(perf): update benchmark baseline"
+          file_pattern: ".github/.cache/bench.json"

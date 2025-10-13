@@ -162,3 +162,4 @@ badwords.json
 
 docs
 /src/debug.ts
+/benchmark-summary.md

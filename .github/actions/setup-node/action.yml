@@ -13,7 +13,7 @@ runs:
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.GITHUB_TOKEN }}
+        node-version: ${{ inputs.NODE_VERSION }}
 
     - uses: pnpm/action-setup@v4
       name: Install pnpm
