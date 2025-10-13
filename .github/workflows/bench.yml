@@ -61,7 +61,7 @@ jobs:
 
       - name: Commit and push baseline update
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@8fa7f5a3c51038deaa521c22ae89fac24baad8e7
         with:
           commit_message: "chore(perf): update benchmark baseline"
           file_pattern: ".github/.cache/bench.json"
