@@ -1,9 +1,10 @@
 import { VBANPacket } from '../VBANPacket.js';
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { ESubProtocol } from '../ESubProtocol.js';
 import { BITS_SPEEDS, EFormatBit } from '../../commons.js';
 import { ETextEncoding } from './ETextEncoding.js';
 import { IVBANHeaderTEXT } from './IVBANHeaderTEXT.js';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
 
 export class VBANTEXTPacket extends VBANPacket {
     /**
@@ -62,6 +63,10 @@ export class VBANTEXTPacket extends VBANPacket {
         this.sr = 0;
     }
 
+    public toUDPPacket(): ReturnType<(typeof VBANTEXTPacket)['toUDPPacket']> {
+        return VBANTEXTPacket.toUDPPacket(this);
+    }
+
     public static toUDPPacket(packet: VBANTEXTPacket): Buffer {
         const data = packet.text
             ? Buffer.from(packet.text, VBANTEXTPacket.getEncoding(packet.encoding))
@@ -89,9 +94,7 @@ export class VBANTEXTPacket extends VBANPacket {
         );
     }
 
-    public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer) {
-        const headers = this.prepareFromUDPPacket(headersBuffer);
-
+    public static fromUDPPacket(headers: IVBANHeaderCommon, dataBuffer: Buffer) {
         if (headers.srIndex === undefined || BITS_SPEEDS[headers.srIndex] === undefined) {
             throw new Error(`unknown bits speed ${headers.srIndex}`);
         }

@@ -1,4 +1,5 @@
 import { EFormatBit, ESerialStreamType, VBANSerialPacket, VBANServer } from '../src/index.js';
+import { Buffer } from 'node:buffer';
 
 const server = new VBANServer();
 

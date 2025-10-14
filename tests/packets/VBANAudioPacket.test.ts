@@ -1,4 +1,4 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { EBitsResolutions, ECodecs, ESubProtocol, sampleRates, VBANAudioPacket, VBANProtocolFactory } from '../../src/index.js';
 
 describe('VBANAudioPacket.test.ts', () => {

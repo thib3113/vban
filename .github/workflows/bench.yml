@@ -1,0 +1,81 @@
+name: Performance Benchmarks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [ lts/*]
+
+    name: Run performance benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch (HEAD)
+        uses: actions/checkout@v4
+        with:
+          path: './PR'
+
+      - uses: ./PR/.github/actions/setup-node
+        with:
+          NODE_VERSION: ${{ matrix.node-version }}
+          WORKING_DIRECTORY: './PR'
+
+      - name: Checkout base branch (main) into a separate directory
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }} # This is typically 'main'
+          path: './main-branch'
+
+      - run: ls -alh ./main-branch
+
+      - name: Install and Build main branch code
+        uses: ./PR/.github/actions/setup-node
+        with:
+          WORKING_DIRECTORY: ./main-branch
+          NODE_VERSION: ${{ matrix.node-version }}
+
+      - name: Run comparison benchmark
+        # This script now takes two paths to compare the compiled code
+        run: node bench.js --compare ./lib ../main-branch/lib
+        working-directory: './PR'
+
+      - name: Post benchmark summary as a PR comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('PR/benchmark-summary.md', 'utf8');
+            const commentIdentifier = '<!-- VBAN_BENCHMARK_COMMENT -->'; // Hidden identifier
+            const body = summary + '\n\n' + commentIdentifier;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const previousComment = comments.find(comment => comment.body.includes(commentIdentifier));
+            if (previousComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: previousComment.id,
+                body: body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body,
+              });
+            }

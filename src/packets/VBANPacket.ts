@@ -1,9 +1,16 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { ESubProtocol } from './ESubProtocol.js';
 import { IVBANHeaderCommon } from './IVBANHeaderCommon.js';
-import { cleanPacketString, PACKET_IDENTIFICATION, sampleRates, STREAM_NAME_LENGTH } from '../commons.js';
+import {
+    cleanPacketString,
+    PACKET_IDENTIFICATION,
+    sampleRates,
+    sampleRatesMapIndex,
+    STREAM_NAME_LENGTH,
+    SUB_PROTOCOL_MASK
+} from '../commons.js';
 import { IVBANHeader } from './IVBANHeader.js';
-import { VBAN_DATA_MAX_SIZE } from './VBANSpecs.js';
+import { VBAN_DATA_MAX_SIZE, VBAN_HEADER_LENGTH } from './VBANSpecs.js';
 
 export class VBANPacket {
     /**
@@ -27,30 +34,37 @@ export class VBANPacket {
 
     public static readonly frameCounters: Map<string, number> = new Map<string, number>();
 
-    /**
-     * Extract headers and data from UDPPacket, each Packet will continue the process
-     */
-    public static prepareFromUDPPacket(headersBuffer: Buffer, checkSR = true): IVBANHeaderCommon {
-        const headers: Partial<IVBANHeaderCommon> = {};
-
-        // SR / Sub protocol (5 + 3 bits)
-        const srsp = headersBuffer.readUInt8(PACKET_IDENTIFICATION.length);
-        //take last 5 bits for sampleRate
-        const srIndex = srsp & 0b00011111; // 5 last Bits
-
-        if ((checkSR && !sampleRates.hasOwnProperty(srIndex)) || sampleRates[srIndex] === undefined) {
+    public static getSampleRate(srIndex?: number): number {
+        if (srIndex === undefined || srIndex === null || !sampleRates.hasOwnProperty(srIndex) || sampleRates[srIndex] === undefined) {
             throw new Error(`unknown sample rate ${srIndex}`);
         }
-        headers.sr = sampleRates[srIndex];
-        headers.srIndex = srIndex;
+        return sampleRates[srIndex];
+    }
 
-        // Samples per frame (8 bits)
-        headers.part1 = headersBuffer.readUInt8(5);
+    public static parsePacketHeader(headersBuffer: Buffer): IVBANHeaderCommon {
+        const headers: Partial<IVBANHeaderCommon> = {};
 
-        // Channels (8 bits)
-        headers.part2 = headersBuffer.readUInt8(6);
+        if (headersBuffer.toString('ascii', 0, PACKET_IDENTIFICATION.length) !== PACKET_IDENTIFICATION) {
+            throw new Error('Invalid Header');
+        }
 
-        headers.part3 = headersBuffer.readUInt8(7);
+        // read next 4 Bytes
+        const chunk = headersBuffer.readUInt32BE(PACKET_IDENTIFICATION.length);
+
+        // noinspection PointlessArithmeticExpressionJS
+        const sr_sp = (chunk >> (3 * 8)) & 0b11111111;
+        // noinspection PointlessArithmeticExpressionJS
+        headers.part1 = (chunk >> (2 * 8)) & 0b11111111;
+        // noinspection PointlessArithmeticExpressionJS
+        headers.part2 = (chunk >> (1 * 8)) & 0b11111111;
+        // noinspection PointlessArithmeticExpressionJS
+        headers.part3 = (chunk >> (0 * 8)) & 0b11111111;
+
+        // 3 first bits
+        headers.sp = sr_sp & SUB_PROTOCOL_MASK;
+
+        //take last 5 bits for sampleRate
+        headers.srIndex = sr_sp & 0b00011111; // 5 last bits
 
         // Stream Name (16 bytes)
         headers.streamName = cleanPacketString(headersBuffer.toString('ascii', 8, 8 + STREAM_NAME_LENGTH));
@@ -61,11 +75,39 @@ export class VBANPacket {
         return headers as IVBANHeaderCommon;
     }
 
+    public static parsePacket(packet: Buffer): {
+        headers: IVBANHeaderCommon;
+        data: Buffer;
+    } {
+        const headerBuffer = packet.subarray(0, VBAN_HEADER_LENGTH);
+        const dataBuffer = packet.subarray(VBAN_HEADER_LENGTH);
+
+        const headers = this.parsePacketHeader(headerBuffer);
+
+        return {
+            headers,
+            data: dataBuffer
+        };
+    }
+
+    /**
+     * Extract headers and data from UDPPacket, each Packet will continue the process
+     * @deprecated
+     */
+    public static prepareFromUDPPacket(headersBuffer: Buffer, checkSR = true): IVBANHeaderCommon {
+        const headers = this.parsePacketHeader(headersBuffer);
+        if (checkSR) {
+            headers.sr = this.getSampleRate(headers.srIndex);
+        }
+
+        return headers;
+    }
+
     /**
      * common constructor
      */
     constructor(headers: IVBANHeader) {
-        this.sr = headers.sr;
+        this.sr = headers.sr ?? 0;
         this.streamName = headers.streamName;
         // Frame Counter (32 bits)
         this.frameCounter = headers.frameCounter ?? 1;
@@ -75,44 +117,49 @@ export class VBANPacket {
      * Convert a VBANPacket to a UDP packet
      */
     protected static convertToUDPPacket(headers: Omit<IVBANHeaderCommon, 'srIndex'>, data: Buffer, sampleRate?: number): Buffer {
-        let bufferStart = 0;
-
-        const headersBuffer = Buffer.alloc(28);
-
-        bufferStart += PACKET_IDENTIFICATION.length;
-        headersBuffer.fill(PACKET_IDENTIFICATION, bufferStart - PACKET_IDENTIFICATION.length, bufferStart, 'ascii');
-
-        let rate = sampleRate ?? 0;
-        if (sampleRate === undefined) {
-            //search sampleRate
-            rate = Number(
-                Object.entries(sampleRates)
-                    .find(([, sr]) => sr && sr === headers.sr)
-                    ?.shift()
-            );
-            if (!rate) {
-                throw new Error(`fail to find index for sample rate ${headers.sr}`);
-            }
+        if (headers.sp === ESubProtocol.UNKNOWN) {
+            throw new Error(`You can't convert an unknown packet to UDP packet`);
         }
-
-        headersBuffer.fill((rate & 0b00011111) | (headers.sp & 0b11100000), bufferStart++);
-
-        headersBuffer.fill(headers.part1, bufferStart++);
-        headersBuffer.fill(headers.part2, bufferStart++);
-        headersBuffer.fill(headers.part3, bufferStart++);
-
-        headersBuffer.fill(headers.streamName.padEnd(STREAM_NAME_LENGTH, '\0'), bufferStart, bufferStart + STREAM_NAME_LENGTH, 'ascii');
-        bufferStart += STREAM_NAME_LENGTH;
-
-        headersBuffer.writeUInt32LE(headers.frameCounter ?? 1, bufferStart);
-
         if (data.length > VBAN_DATA_MAX_SIZE) {
             throw new Error(
                 `VBAN DATA MAX SIZE = ${VBAN_DATA_MAX_SIZE} ! You try to send a packet with ${data.length} bytes . You can use the exported var VBAN_DATA_MAX_SIZE to split your datas in packets`
             );
         }
 
-        return Buffer.concat([headersBuffer, data.subarray(0, VBAN_DATA_MAX_SIZE)]);
+        const finalBuffer = Buffer.alloc(VBAN_HEADER_LENGTH + data.length);
+
+        let offset = 0;
+
+        offset += finalBuffer.write(PACKET_IDENTIFICATION, offset, 'ascii');
+
+        let rateIndex: number = 0;
+        if (sampleRate === undefined && headers.sr) {
+            // La recherche est maintenant instantanée (O(1))
+            const rateIndexFromMap = sampleRatesMapIndex.get(headers.sr);
+            if (!rateIndexFromMap) {
+                throw new Error(`fail to find index for sample rate ${headers.sr}`);
+            }
+
+            rateIndex = rateIndexFromMap;
+        } else if (sampleRate !== undefined) {
+            rateIndex = sampleRate;
+        }
+
+        // Écriture des parties du header avec `writeUInt8` (plus rapide que `fill`)
+        offset = finalBuffer.writeUInt8((rateIndex & 0b00011111) | (headers.sp & 0b11100000), offset);
+        offset = finalBuffer.writeUInt8(headers.part1, offset);
+        offset = finalBuffer.writeUInt8(headers.part2, offset);
+        offset = finalBuffer.writeUInt8(headers.part3, offset);
+
+        // Écriture du nom du stream
+        offset += finalBuffer.write(headers.streamName.padEnd(STREAM_NAME_LENGTH, '\0'), offset, 'ascii');
+
+        // Écriture du compteur
+        finalBuffer.writeUInt32LE(headers.frameCounter ?? 1, offset);
+
+        data.copy(finalBuffer, VBAN_HEADER_LENGTH);
+
+        return finalBuffer;
     }
 
     /**
@@ -138,5 +185,9 @@ export class VBANPacket {
         }
 
         this.frameCounters.set(frameCounterKey, headers.frameCounter);
+    }
+
+    public toUDPPacket(): Buffer {
+        throw new Error('Not implemented');
     }
 }

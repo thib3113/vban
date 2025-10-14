@@ -84,27 +84,3 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: false # optional (default = false)
-  sonarcloud:
-    name: SonarCloud
-    runs-on: ubuntu-latest
-    needs: [ build, eslint ]
-    if: always()
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage
-          path: ./coverage/
-      - uses: actions/download-artifact@v4
-        with:
-          name: eslint-coverage
-          path: ./coverage/
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5.3.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

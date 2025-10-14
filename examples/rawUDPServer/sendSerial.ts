@@ -1,5 +1,6 @@
-import dgram from 'dgram';
-import { EFormatBit, ESerialStreamType, VBANSerialPacket } from '../../src';
+import dgram from 'node:dgram';
+import { Buffer } from 'node:buffer';
+import { EFormatBit, ESerialStreamType, VBANSerialPacket } from '../../src/index.js';
 
 const server = dgram.createSocket('udp4');
 

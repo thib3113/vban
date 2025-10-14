@@ -1,12 +1,12 @@
-import { VBANServicePacket } from './VBANServicePacket.js';
-import { IVBANHeaderService } from './IVBANHeaderService.js';
-import { IPacketPingData } from './IPacketPingData.js';
-import { Buffer } from 'buffer';
-import { EServiceType } from './EServiceType.js';
-import { EServicePINGApplicationType } from './EServicePINGApplicationType.js';
-import { EServicePINGFeatures } from './EServicePINGFeatures.js';
-import { cleanPacketString, prepareStringForPacket } from '../../commons.js';
-import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
+import { VBANServicePacket } from '../VBANServicePacket.js';
+import { IVBANHeaderService } from '../IVBANHeaderService.js';
+import { IPacketPingData } from '../IPacketPingData.js';
+import { Buffer } from 'node:buffer';
+import { EServiceType } from '../EServiceType.js';
+import { EServicePINGApplicationType } from '../EServicePINGApplicationType.js';
+import { EServicePINGFeatures } from '../EServicePINGFeatures.js';
+import { cleanPacketString, prepareStringForPacket } from '../../../commons.js';
+import { IVBANHeaderCommon } from '../../IVBANHeaderCommon.js';
 
 export class VBANPingPacket extends VBANServicePacket {
     public data: IPacketPingData;
@@ -106,11 +106,11 @@ export class VBANPingPacket extends VBANServicePacket {
 
         offset = dataBuffer.writeUInt32LE(packet.data.applicationType, offset);
         let features = 0;
-        packet.data.features.forEach((feature) => {
+        for (const feature of packet.data.features) {
             if (EServicePINGFeatures[feature]) {
                 features = features | feature;
             }
-        });
+        }
         offset = dataBuffer.writeUInt32LE(features, offset);
         offset = dataBuffer.writeUInt32LE(packet.data.bitFeatureEx, offset);
         offset = dataBuffer.writeUInt32LE(packet.data.PreferredRate, offset);

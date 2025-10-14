@@ -1,4 +1,4 @@
-import * as readline from 'readline';
+import * as readline from 'node:readline';
 import {
     EServiceFunction,
     EServicePINGApplicationType,
@@ -9,7 +9,7 @@ import {
     VBANServer
 } from '../src/index.js';
 import * as os from 'node:os';
-import { RemoteInfo } from 'dgram';
+import { RemoteInfo } from 'node:dgram';
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -55,7 +55,7 @@ class Chat {
     public start() {
         rl.question('IP Address : ', (address: string) => {
             rl.question('Port : ', async (strPort: string) => {
-                await this.connect(address, parseInt(strPort));
+                await this.connect(address, Number.parseInt(strPort));
                 rl.on('line', (input: string) => {
                     this.sendMessage(input);
                 });

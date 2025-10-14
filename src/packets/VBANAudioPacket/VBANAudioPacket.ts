@@ -4,7 +4,8 @@ import { EBitsResolutions } from './EBitsResolutions.js';
 import { ECodecs } from './ECodecs.js';
 import { IVBANHeaderAudio } from './IVBANHeaderAudio.js';
 import { IBitResolution } from './IBitResolution.js';
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
 
 export class VBANAudioPacket extends VBANPacket {
     /**
@@ -59,6 +60,10 @@ export class VBANAudioPacket extends VBANPacket {
         this.data = data;
     }
 
+    public toUDPPacket(): ReturnType<(typeof VBANAudioPacket)['toUDPPacket']> {
+        return VBANAudioPacket.toUDPPacket(this);
+    }
+
     public static toUDPPacket(packet: VBANAudioPacket): Buffer {
         return this.convertToUDPPacket(
             {
@@ -74,8 +79,7 @@ export class VBANAudioPacket extends VBANPacket {
         );
     }
 
-    public static fromUDPPacket(headersBuffer: Buffer, dataBuffer: Buffer): VBANAudioPacket {
-        const headers = this.prepareFromUDPPacket(headersBuffer);
+    public static fromUDPPacket(headers: IVBANHeaderCommon, dataBuffer: Buffer): VBANAudioPacket {
         const nbSample = headers.part1 + 1;
         const nbChannel = headers.part2 + 1;
 
@@ -92,6 +96,8 @@ export class VBANAudioPacket extends VBANPacket {
             throw new Error(`unknown codec ${codec}`);
         }
 
+        headers.sr = this.getSampleRate(headers.srIndex);
+
         return new VBANAudioPacket(
             {
                 ...headers,
@@ -104,7 +110,7 @@ export class VBANAudioPacket extends VBANPacket {
         );
     }
 
-    public static bitResolutions: Record<number, IBitResolution> = {
+    public static readonly bitResolutions: Record<number, IBitResolution> = {
         0: { bitDepth: 8, signed: false, float: false },
         1: { bitDepth: 16, signed: true, float: false },
         2: { bitDepth: 24, signed: true, float: false },

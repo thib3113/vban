@@ -1,4 +1,8 @@
+import { Buffer } from 'node:buffer';
+
 export const PACKET_IDENTIFICATION = 'VBAN';
+
+export const SUB_PROTOCOL_MASK = 0b11100000;
 
 /**
  * the stream name is limited to 16 bytes
@@ -40,6 +44,41 @@ export const BITS_SPEEDS: Record<number, number> = {
     31: 0
 };
 
+export const MBPS_SPEEDS: Record<number, number> = {
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 8,
+    8: 10,
+    9: 12,
+    10: 16,
+    11: 24,
+    12: 36,
+    13: 48,
+    14: 60,
+    15: 84,
+    16: 108,
+    17: 156,
+    18: 204,
+    19: 252,
+    20: 300,
+    21: 400,
+    22: 500,
+    23: 600,
+    24: 800,
+    25: 0, // Undefined
+    26: 0, // Undefined
+    27: 0, // Undefined
+    28: 0, // Undefined
+    29: 0, // Undefined
+    30: 0, // Undefined
+    31: 0 // Undefined
+};
+
 export enum EFormatBit {
     /**
      * 0 to 255
@@ -72,7 +111,7 @@ export function dec2bin(dec: number) {
 
 export function bufferToHex(buffer: Buffer) {
     if (!Buffer.isBuffer(buffer)) {
-        throw new Error('need to be a buffer');
+        throw new TypeError('need to be a buffer');
     }
 
     let hexString = '';
@@ -130,3 +169,10 @@ export const sampleRates: Record<number, number> = {
     30: 0,
     31: 0
 };
+
+export const sampleRatesMap = new Map<number, number>();
+export const sampleRatesMapIndex = new Map<number, number>();
+for (const [index, rate] of Object.entries(sampleRates)) {
+    sampleRatesMapIndex.set(rate, Number(index));
+    sampleRatesMap.set(Number(index), rate);
+}

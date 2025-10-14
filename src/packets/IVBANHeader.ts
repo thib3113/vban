@@ -1,7 +1,7 @@
 import { ESubProtocol } from './ESubProtocol.js';
 
 export interface IVBANHeader {
-    sr: number;
+    sr?: number;
     srIndex?: number;
     sp: ESubProtocol;
     streamName: string;

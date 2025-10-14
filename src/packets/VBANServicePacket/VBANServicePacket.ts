@@ -1,9 +1,10 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { VBANPacket } from '../VBANPacket.js';
 import { ESubProtocol } from '../ESubProtocol.js';
 import { EServiceType } from './EServiceType.js';
 import { IVBANHeaderService } from './IVBANHeaderService.js';
 import { EServiceFunction } from './EServiceFunction.js';
+import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
 
 export class VBANServicePacket extends VBANPacket {
     /**
@@ -49,6 +50,10 @@ export class VBANServicePacket extends VBANPacket {
 
     public toUDPPacket(): ReturnType<(typeof VBANServicePacket)['toUDPPacket']> {
         return VBANServicePacket.toUDPPacket(this);
+    }
+
+    public static fromUDPPacket(headers: IVBANHeaderCommon, dataBuffer: Buffer): undefined | VBANServicePacket {
+        throw new Error('call VBANServicePacketFactory.fromUDPPacker');
     }
 
     public static toUDPPacket(packet: VBANServicePacket): Buffer {

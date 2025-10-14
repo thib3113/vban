@@ -1,11 +1,15 @@
 name: 'setup nodejs'
+description: 'Sets up Node.js, pnpm, installs dependencies, and builds the project'
 
 inputs:
   NODE_VERSION:
     description: "the node version"
-    required: true
+    required: false
     default: 'lts/*'
-
+  WORKING_DIRECTORY:
+    description: "The directory to run install and build steps in"
+    required: false
+    default: '.'
 
 runs:
   using: "composite"
@@ -13,13 +17,14 @@ runs:
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.GITHUB_TOKEN }}
+        node-version: ${{ inputs.NODE_VERSION }}
 
-    - uses: pnpm/action-setup@v4
-      name: Install pnpm
-      id: pnpm-install
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
       with:
-        run_install: true
+        # We run install manually to respect the working-directory
+        run_install: false
+        package_json_file: "${{ inputs.WORKING_DIRECTORY }}/package.json"
 
     - name: Get pnpm store directory
       id: pnpm-cache
@@ -27,21 +32,23 @@ runs:
       run: |
         echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-    - uses: actions/cache@v4
-      name: Setup pnpm cache
+    - name: Setup pnpm cache
+      uses: actions/cache@v4
       with:
         path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        # Correctly hash the lock file inside the specified working directory
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles(format('{0}/pnpm-lock.yaml', inputs.WORKING_DIRECTORY)) }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
     - name: Install dependencies
       shell: bash
       run: pnpm install
+      working-directory: ${{ inputs.WORKING_DIRECTORY }}
 
     - name: Build project
       shell: bash
-      run: |
-        pnpm run build
+      run: pnpm run build
+      working-directory: ${{ inputs.WORKING_DIRECTORY }}
       env:
         CI: true

@@ -1,6 +1,6 @@
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
-import { jest } from '@jest/globals';
+import { expect, jest } from '@jest/globals';
 import { EServiceType } from '../src/packets/VBANServicePacket/EServiceType.js';
 import { EServiceFunction } from '../src/packets/VBANServicePacket/EServiceFunction.js';
 import { ESubProtocol } from '../src/packets/ESubProtocol.js';
@@ -21,7 +21,7 @@ jest.unstable_mockModule('../src/VBANProtocolFactory', () => {
 
 const VBANPingPacketObject = jest.fn();
 const mockVBANPingPacketConstructor = jest.fn().mockReturnValue(VBANPingPacketObject);
-jest.unstable_mockModule('../src/packets/VBANServicePacket/VBANPingPacket.js', () => {
+jest.unstable_mockModule('../src/packets/VBANServicePacket/subPackets/VBANPingPacket.js', () => {
     return {
         VBANPingPacket: mockVBANPingPacketConstructor
     };
@@ -53,7 +53,7 @@ jest.unstable_mockModule('node:dgram', () => {
 
 const { VBANServer } = await import('../src/VBANServer.js');
 
-const { VBANPingPacket } = await import('../src/packets/VBANServicePacket/VBANPingPacket.js');
+const { VBANPingPacket } = await import('../src/packets/VBANServicePacket/subPackets/VBANPingPacket.js');
 
 beforeEach(() => {
     jest.resetAllMocks();
@@ -120,6 +120,7 @@ describe('VBANServer.test.ts', () => {
             const listeningArgs = ['a', 'b', 'c'];
             listeningFn(...listeningArgs);
             expect(server.isListening).toBe(true);
+            // @ts-ignore
             expect(server.emit).toHaveBeenCalledWith('listening', ...listeningArgs);
             (server.emit as jest.Mock).mockReset();
 
@@ -133,6 +134,7 @@ describe('VBANServer.test.ts', () => {
             //error
             const errorArgs = ['b', 'd', 'c'];
             errorFn(...errorArgs);
+            // @ts-ignore
             expect(server.emit).toHaveBeenCalledWith('error', ...errorArgs);
             (server.emit as jest.Mock).mockReset();
         });
@@ -205,7 +207,7 @@ describe('VBANServer.test.ts', () => {
     });
 
     describe('send', () => {
-        it('should send', () => {
+        it('should send', async () => {
             const server = new VBANServer();
 
             const packet = new VBANServicePacket({
@@ -214,10 +216,49 @@ describe('VBANServer.test.ts', () => {
                 serviceFunction: EServiceFunction.PING0,
                 isReply: false
             });
+
+            socketMock.send.mockImplementationOnce((...args) => {
+                const fn = args.pop();
+
+                if (typeof fn !== 'function') {
+                    throw new TypeError(`unrecognized service function: ${fn}`);
+                }
+
+                fn(null);
+            });
             const udpPacket = Buffer.from('foo:bar');
             toUDPBufferMock.mockImplementationOnce(() => udpPacket);
 
-            server.send(packet, 6980, '127.0.0.1');
+            await server.send(packet, 6980, '127.0.0.1');
+
+            expect(socketMock.send).toHaveBeenCalledWith(udpPacket, 6980, '127.0.0.1', expect.any(Function));
+        });
+        it('should handle error', async () => {
+            const server = new VBANServer();
+
+            const packet = new VBANServicePacket({
+                streamName: 'VBAN Service',
+                service: EServiceType.CHATUTF8,
+                serviceFunction: EServiceFunction.PING0,
+                isReply: false
+            });
+
+            const err = new Error('my error');
+
+            socketMock.send.mockImplementationOnce((...args) => {
+                const fn = args.pop();
+
+                if (typeof fn !== 'function') {
+                    throw new TypeError(`unrecognized service function: ${fn}`);
+                }
+
+                fn(err);
+            });
+
+            const udpPacket = Buffer.from('foo:bar');
+            toUDPBufferMock.mockImplementationOnce(() => udpPacket);
+
+            await expect(server.send(packet, 6980, '127.0.0.1')).rejects.toThrow(err);
 
             expect(socketMock.send).toHaveBeenCalledWith(udpPacket, 6980, '127.0.0.1', expect.any(Function));
         });
@@ -296,7 +337,7 @@ describe('VBANServer.test.ts', () => {
             server.messageHandler(udpBuffer, sender);
 
             expect(processPacketMock).toHaveBeenCalledWith(udpBuffer);
-            expect(emitMock).toHaveBeenCalledWith('message', packet, sender);
+            expect(emitMock).toHaveBeenCalledWith('message', packet, sender, udpBuffer);
         });
 
         describe('beforeProcessPacket', () => {
@@ -342,7 +383,7 @@ describe('VBANServer.test.ts', () => {
 
                 expect(beforeProcessMock).toHaveBeenCalledWith(udpBuffer, sender);
                 expect(processPacketMock).toHaveBeenCalledWith(udpBuffer);
-                expect(emitMock).toHaveBeenCalledWith('message', packet, sender);
+                expect(emitMock).toHaveBeenCalledWith('message', packet, sender, udpBuffer);
             });
         });
 
@@ -369,7 +410,7 @@ describe('VBANServer.test.ts', () => {
                 // @ts-ignore
                 await server.messageHandler(udpBuffer, sender);
                 expect(processPacketMock).toHaveBeenCalledWith(udpBuffer);
-                expect(emitMock).toHaveBeenCalledWith('message', packet, sender);
+                expect(emitMock).toHaveBeenCalledWith('message', packet, sender, udpBuffer);
 
                 expect(sendPingMock).toHaveBeenCalledWith(sender, true);
             });

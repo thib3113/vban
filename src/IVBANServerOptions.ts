@@ -1,5 +1,6 @@
 import { EServicePINGApplicationType, EServicePINGFeatures } from './packets/index.js';
-import { RemoteInfo } from 'dgram';
+import type { RemoteInfo } from 'node:dgram';
+import { Buffer } from 'node:buffer';
 
 export interface IVBANServerOptions {
     application?: {

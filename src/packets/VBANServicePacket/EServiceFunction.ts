@@ -1,4 +1,6 @@
 export enum EServiceFunction {
-    PING0 = 0x00,
-    REPLY = 0x80
+    //0x00
+    PING0 = 0,
+    //0x80
+    REPLY = 128
 }
