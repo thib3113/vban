@@ -1,8 +1,6 @@
 name: Performance Benchmarks
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 

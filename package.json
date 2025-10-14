@@ -32,8 +32,8 @@
     "@types/debug": "^4.1.12",
     "@types/jest": "30.0.0",
     "@types/node": "24.7.2",
-    "@typescript-eslint/eslint-plugin": "8.46.0",
-    "@typescript-eslint/parser": "8.46.0",
+    "@typescript-eslint/eslint-plugin": "8.46.1",
+    "@typescript-eslint/parser": "8.46.1",
     "dotenv": "17.2.3",
     "esbuild": "0.25.10",
     "eslint": "9.37.0",
@@ -49,7 +49,7 @@
     "ts-node": "10.9.2",
     "typedoc": "0.28.14",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.46.0"
+    "typescript-eslint": "8.46.1"
   },
   "scripts": {
     "debug": "tsc -p tsconfig.build.json && node --enable-source-maps ./lib/debug.js",
