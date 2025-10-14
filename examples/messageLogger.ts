@@ -125,13 +125,12 @@ if (isMainThread) {
 
     // The 'message' event now also provides the raw buffer as the third argument.
     server.on('message', (packet, sender, rawBuffer) => {
-        const serializablePacket = JSON.parse(JSON.stringify(packet));
         const packetType = packet.constructor.name;
         const base64Packet = rawBuffer.toString('base64');
 
         // Send all relevant information to the main thread.
         parentPort?.postMessage({
-            packet: serializablePacket,
+            packet,
             sender: sender,
             packetType: packetType,
             base64Packet: base64Packet

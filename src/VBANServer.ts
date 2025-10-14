@@ -1,7 +1,7 @@
 import dgram, { BindOptions, RemoteInfo, Socket } from 'node:dgram';
-import type { AddressInfo } from 'net';
+import type { AddressInfo } from 'node:net';
 import type { Buffer } from 'node:buffer';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import {
     EServiceFunction,
     EServicePINGApplicationType,
