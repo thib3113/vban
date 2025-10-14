@@ -79,7 +79,7 @@ const testPackets = [
     }
 ];
 
-async function runBenchmarks(VBANProtocolFactory, benchSuffix = '') {
+async function runBenchmarks(VBANProtocolFactory) {
     const bench = new Bench({
         iterations: 100000
     });
@@ -115,10 +115,10 @@ async function main() {
         const MAIN_VBAN = await import(path.join(mainPath, 'index.mjs'));
 
         console.error('Benchmarking Main branch version...');
-        const mainResults = formatResults((await runBenchmarks(MAIN_VBAN.VBANProtocolFactory, 'main')).tasks);
+        const mainResults = formatResults((await runBenchmarks(MAIN_VBAN.VBANProtocolFactory)).tasks);
 
         console.error('Benchmarking PR branch version...');
-        const prResults = formatResults((await runBenchmarks(PR_VBAN.VBANProtocolFactory, 'current')).tasks);
+        const prResults = formatResults((await runBenchmarks(PR_VBAN.VBANProtocolFactory)).tasks);
 
         const summary = generateComparisonSummary(mainResults, prResults);
         console.log(summary); // For local viewing
