@@ -35,16 +35,10 @@ jobs:
           path: 'main-branch'
 
       - name: Install and Build main branch code
-        run: |
-          cd main-branch
-
-      - uses: ./.github/actions/setup-node
+        working-directory: ./main-branch
+        uses: ./.github/actions/setup-node
         with:
           NODE_VERSION: ${{ matrix.node-version }}
-
-      - run: |
-          cd ..
-
 
       - name: Run comparison benchmark
         # This script now takes two paths to compare the compiled code
