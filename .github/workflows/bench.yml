@@ -26,7 +26,7 @@ jobs:
         with:
           path: './PR'
 
-      - uses: ./.github/actions/setup-node
+      - uses: ./PR/.github/actions/setup-node
         with:
           NODE_VERSION: ${{ matrix.node-version }}
           WORKING_DIRECTORY: './PR'
@@ -38,7 +38,7 @@ jobs:
           path: './main-branch'
 
       - name: Install and Build main branch code
-        uses: ./.github/actions/setup-node
+        uses: ./PR/.github/actions/setup-node
         with:
           WORKING_DIRECTORY: ./main-branch
           NODE_VERSION: ${{ matrix.node-version }}
