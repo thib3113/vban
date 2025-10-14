@@ -25,13 +25,13 @@ function renderVuMeter(level, channelCount, sampleRate) {
         renderVuMeter(0, channelCount, sampleRate);
     }, 100);
 
-    const percentage = Math.min(level / MAX_LEVEL, 1.0);
+    const percentage = Math.min(level / MAX_LEVEL, 1);
     const filledLength = Math.round(BAR_WIDTH * percentage);
     const emptyLength = BAR_WIDTH - filledLength;
 
     const bar = '█'.repeat(filledLength) + ' '.repeat(emptyLength);
     const levelDb = 20 * Math.log10(level / MAX_LEVEL);
-    const dbString = isFinite(levelDb) ? `${levelDb.toFixed(1)} dB` : '-inf dB';
+    const dbString = Number.isFinite(levelDb) ? `${levelDb.toFixed(1)} dB` : '-inf dB';
 
     // Using process.stdout.write and '\r' to overwrite the line
     process.stdout.write(`[${channelCount}ch|${sampleRate / 1000}kHz] |${bar}| ${dbString.padEnd(10)}\r`);

@@ -68,7 +68,7 @@ rl.question('IP Address to connect to: ', (address) => {
     // VBAN Chat seems to require to listen and answer on the same port ?
     rl.question('Port to use (listen and connect): ', (portStr) => {
         const port = Number.parseInt(portStr, 10);
-        if (isNaN(port)) {
+        if (Number.isNaN(port)) {
             console.error('Invalid port number.');
             process.exit(1);
         }
