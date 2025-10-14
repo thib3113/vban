@@ -1,6 +1,6 @@
 {
   "name": "vban",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Node VBAN implementation",
   "main": "./lib/index.cjs",
   "module": "./lib/index.mjs",
