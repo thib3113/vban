@@ -1,5 +1,4 @@
 import { Bench } from 'tinybench';
-import { VBANProtocolFactory } from './lib/index.mjs';
 import { Buffer } from 'node:buffer';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -22,43 +21,40 @@ function getPreviousResults() {
 
 function formatResults(tasks) {
     const results = {};
-    tasks.forEach((task) => {
+    for (const task of tasks) {
         if (task.result) {
             results[task.name] = {
                 hz: task.result.hz,
                 rme: task.result.rme
             };
         }
-    });
+    }
     return results;
 }
+function generateComparisonSummary(mainResults, prResults) {
+    let summary = '### 📊 VBAN Packet Performance (PR vs Main)\n\n';
+    summary += '| Benchmark | Main Branch | PR Branch | Change |\n';
+    summary += '|-----------|-------------|-----------|--------|\n';
 
-function generateMarkdownSummary(previousResults, currentResults) {
-    let summary = '### 📊 VBAN Packet Performance\n\n';
-    summary += '| Benchmark | Previous | Current | Change |\n';
-    summary += '|-----------|----------|---------|--------|\n';
-
-    for (const name in currentResults) {
-        const current = currentResults[name];
-        const previous = previousResults[name];
-        const currentValue = Math.round(current.hz).toLocaleString('en-US');
+    for (const name in prResults) {
+        const pr = prResults[name];
+        const main = mainResults[name];
+        const prValue = `${Math.round(pr.hz).toLocaleString('en-US')} ops/sec (±${pr.rme.toFixed(2)}%)`;
 
         let changeStr = '➖';
-        let previousValue = 'N/A';
+        let mainValue = 'N/A';
 
-        if (previous) {
-            previousValue = Math.round(previous.hz).toLocaleString('en-US');
-            const change = ((current.hz - previous.hz) / previous.hz) * 100;
+        if (main) {
+            mainValue = `${Math.round(main.hz).toLocaleString('en-US')} ops/sec`;
+            const change = ((pr.hz - main.hz) / main.hz) * 100;
             if (change > 2) {
                 changeStr = `🚀 **+${change.toFixed(2)}%**`;
             } else if (change < -2) {
                 changeStr = `🐢 **${change.toFixed(2)}%**`;
             }
         }
-
-        summary += `| ${name} | \`${previousValue} ops/sec\` | \`${currentValue} ops/sec\` (±${current.rme.toFixed(2)}%) | ${changeStr} |\n`;
+        summary += `| ${name} | \`${mainValue}\` | \`${prValue}\` | ${changeStr} |\n`;
     }
-
     return summary;
 }
 
@@ -83,8 +79,7 @@ const testPackets = [
     }
 ];
 
-async function main() {
-    const shouldUpdateCache = process.argv.includes('--update-cache');
+async function runBenchmarks(VBANProtocolFactory, benchSuffix = '') {
     const bench = new Bench();
 
     for (const { description, base64Packet } of testPackets) {
@@ -100,53 +95,41 @@ async function main() {
             });
     }
 
-    console.error(`Benchmark Starts`);
     await bench.run();
+    return bench;
+}
 
-    console.error('Benchmarks complete.');
+async function main() {
+    const args = process.argv.slice(2);
+    const shouldUpdateCache = args.includes('--update-cache');
+    const isComparison = args.includes('--compare');
 
-    // Process and save results
-    const currentResults = formatResults(bench.tasks);
-    const previousResults = getPreviousResults();
+    if (isComparison) {
+        const prPath = path.resolve(args[args.indexOf('--compare') + 1]);
+        const mainPath = path.resolve(args[args.indexOf('--compare') + 2]);
 
-    const table = bench.table();
-    console.table(
-        bench.tasks.map((task) => {
-            const formattedTask = table.find((t) => t['Task name'] === task.name);
-            const previous = previousResults[task.name];
-            let changeStr = '➖';
-            let previousValue = 'N/A';
+        console.error(`Comparing PR build at ${prPath} with Main build at ${mainPath}`);
 
-            if (previous) {
-                previousValue = Math.round(previous.hz).toLocaleString('en-US');
-                const change = ((task.result.hz - previous.hz) / previous.hz) * 100;
-                if (change > 2) {
-                    changeStr = `🚀 +${change.toFixed(2)}%`;
-                } else if (change < -2) {
-                    changeStr = `🐢 ${change.toFixed(2)}%`;
-                }
-            }
+        const PR_VBAN = await import(path.join(prPath, 'index.mjs'));
+        const MAIN_VBAN = await import(path.join(mainPath, 'index.mjs'));
 
-            return {
-                ...formattedTask,
-                'Previous (ops/sec)': previousValue,
-                Change: changeStr
-            };
-        })
-    );
+        console.error('Benchmarking Main branch version...');
+        const mainResults = formatResults(await runBenchmarks(MAIN_VBAN.VBANProtocolFactory, 'main'));
 
-    // Generate the Markdown summary for the CI/PR comment
-    const markdownSummary = generateMarkdownSummary(previousResults, currentResults);
-    fs.writeFileSync(SUMMARY_FILE, markdownSummary, 'utf-8');
-    console.error(`Benchmark summary written to ${SUMMARY_FILE}`);
+        console.error('Benchmarking PR branch version...');
+        const prResults = await runBenchmarks(PR_VBAN.VBANProtocolFactory, 'current');
 
-    if (shouldUpdateCache) {
-        if (!fs.existsSync(CACHE_DIR)) {
-            fs.mkdirSync(CACHE_DIR, { recursive: true });
-        }
-        fs.writeFileSync(CACHE_FILE, JSON.stringify(currentResults, null, 2), 'utf-8');
-        console.error(`Benchmark cache updated at ${CACHE_FILE}`);
+        const summary = generateComparisonSummary(mainResults, prResults);
+        console.log(summary); // For local viewing
+        fs.writeFileSync(SUMMARY_FILE, summary, 'utf-8');
+        console.error(`Comparison summary written to ${SUMMARY_FILE}`);
+    } else {
+        // Standard run (for cache update or local check)
+        const { VBANProtocolFactory } = await import('./lib/index.mjs');
+        const bench = await runBenchmarks(VBANProtocolFactory);
+
+        console.table(bench.table());
     }
 }
 
-main().catch(console.error);
+await main();

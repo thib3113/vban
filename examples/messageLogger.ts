@@ -1,5 +1,5 @@
-import { Worker, isMainThread, parentPort } from 'node:worker_threads';
-import { VBANServer, bufferToHex } from '../src/index.js';
+import { isMainThread, parentPort, Worker } from 'node:worker_threads';
+import { bufferToHex, VBANServer } from '../src/index.js';
 import { fileURLToPath } from 'node:url';
 import console from 'node:console';
 import { Buffer } from 'node:buffer';
@@ -26,6 +26,24 @@ if (isMainThread) {
     console.log('[Console Thread] Starting...');
     console.log(`[Console Thread] Logging mode set to: ${LOGGING_MODE}`);
     console.log('[Console Thread] Spawning network worker...');
+
+    const getSummary = (message) => {
+        let summary = `${message.packetType.replace('VBAN', '').replace('Packet', '')} from ${message.sender.address.padEnd(
+            15
+        )} on stream "${message.packet.streamName}"`;
+        switch (message.packetType) {
+            case 'VBANAudioPacket':
+                summary += ` (${message.packet.nbSample} samples, ${message.packet.nbChannel} ch)`;
+                break;
+            case 'VBANTEXTPacket':
+                summary += ` | Text: "${message.packet.text.length > 40 ? message.packet.text.substring(0, 37) + '...' : message.packet.text}"`;
+                break;
+            case 'VBANPingPacket':
+                summary += ` | App: ${message.packet.data?.applicationName}`;
+                break;
+        }
+        return summary;
+    };
 
     // Create the worker thread from this very file.
     const worker = new Worker(__filename);
@@ -60,23 +78,7 @@ if (isMainThread) {
                 // @ts-ignore
                 case 'summary':
                 default:
-                    let summary = `${message.packetType.replace('VBAN', '').replace('Packet', '')} from ${message.sender.address.padEnd(
-                        15
-                    )} on stream "${message.packet.streamName}"`;
-                    switch (message.packetType) {
-                        case 'VBANAudioPacket':
-                            summary += ` (${message.packet.nbSample} samples, ${message.packet.nbChannel} ch)`;
-                            break;
-                        case 'VBANTEXTPacket':
-                            const text =
-                                message.packet.text.length > 40 ? message.packet.text.substring(0, 37) + '...' : message.packet.text;
-                            summary += ` | Text: "${text}"`;
-                            break;
-                        case 'VBANPingPacket':
-                            summary += ` | App: ${message.packet.data?.applicationName}`;
-                            break;
-                    }
-                    console.log(summary);
+                    console.log(getSummary(message));
                     break;
             }
         }

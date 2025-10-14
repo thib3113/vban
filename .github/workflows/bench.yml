@@ -21,47 +21,61 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout PR branch (HEAD)
+        uses: actions/checkout@v4
+
       - uses: ./.github/actions/setup-node
         with:
           NODE_VERSION: ${{ matrix.node-version }}
 
-      - name: Restore benchmark baseline from main branch
-        # This step downloads the .github/.cache/bench.json file from the last successful run on the main branch
-        uses: actions/cache/restore@v4
+      - name: Checkout base branch (main) into a separate directory
+        uses: actions/checkout@v4
         with:
-          path: .github/.cache/bench.json
-          key: ${{ runner.os }}-benchmark-main
-          # Add a lookup-only key to ensure we get the latest from main
-          lookup-only: true
+          ref: ${{ github.base_ref }} # This is typically 'main'
+          path: 'main-branch'
 
-      - name: Run benchmark
-        run: node bench.js
+      - name: Install and Build main branch code
+        run: |
+          cd main-branch
+
+      - uses: ./.github/actions/setup-node
+        with:
+          NODE_VERSION: ${{ matrix.node-version }}
+
+      - run: |
+          cd ..
+
+
+      - name: Run comparison benchmark
+        # This script now takes two paths to compare the compiled code
+        run: node bench.js --compare ./lib ./main-branch/lib
 
       - name: Post benchmark summary as a PR comment
-        if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
           script: |
             const fs = require('fs');
-            const summary = fs.readFileSync('./benchmark-summary.md', 'utf8');
-            github.rest.issues.createComment({
+            const summary = fs.readFileSync('benchmarks/benchmark-summary.md', 'utf8');
+            const commentIdentifier = '<!-- VBAN_BENCHMARK_COMMENT -->'; // Hidden identifier
+            const body = summary + '\n\n' + commentIdentifier;
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: summary
             });
-
-      - name: Update benchmark baseline
-        # This step only runs for pushes to the main branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          echo "Updating benchmark baseline on main branch..."
-          node bench.js --update-cache
-
-      - name: Commit and push baseline update
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: stefanzweifel/git-auto-commit-action@8fa7f5a3c51038deaa521c22ae89fac24baad8e7
-        with:
-          commit_message: "chore(perf): update benchmark baseline"
-          file_pattern: ".github/.cache/bench.json"
+            const previousComment = comments.find(comment => comment.body.includes(commentIdentifier));
+            if (previousComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: previousComment.id,
+                body: body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body,
+              });
+            }

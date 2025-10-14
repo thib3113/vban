@@ -1,4 +1,3 @@
-import { Buffer } from 'node:buffer';
 import { BITS_SPEEDS, EFormatBit, ESubProtocol, ETextEncoding, VBANProtocolFactory, VBANTEXTPacket } from '../../src/index.js';
 
 describe('VBANTextPacket.test.ts', () => {

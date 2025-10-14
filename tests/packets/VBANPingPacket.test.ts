@@ -1,11 +1,9 @@
-import { Buffer } from 'node:buffer';
 import {
     EServiceFunction,
     EServicePINGApplicationType,
     EServicePINGFeatures,
     EServiceType,
     ESubProtocol,
-    VBANPacket,
     VBANPingPacket,
     VBANProtocolFactory,
     VBANUnknownPacket

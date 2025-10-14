@@ -10,7 +10,6 @@ import {
     VBANPacket,
     VBANProtocolFactory
 } from '../src/index.js';
-import { createHash } from 'node:crypto';
 
 type TestHeaderProps = Omit<IVBANHeaderCommon, 'sr'> & { srIndex: number; frameCounter: number };
 

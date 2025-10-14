@@ -1,5 +1,4 @@
 import { BITS_SPEEDS, EFormatBit, ESubProtocol, VBANProtocolFactory, VBANSerialPacket } from '../../src/index.js';
-import { Buffer } from 'node:buffer';
 
 describe('VBANSerialPacket.test.ts', () => {
     describe('from Buffer', () => {
