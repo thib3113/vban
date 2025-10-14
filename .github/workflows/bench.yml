@@ -37,12 +37,12 @@ jobs:
           ref: ${{ github.base_ref }} # This is typically 'main'
           path: './main-branch'
 
-      - run: ls -alh ../main-branch
+      - run: ls -alh ./main-branch
 
       - name: Install and Build main branch code
         uses: ./PR/.github/actions/setup-node
         with:
-          WORKING_DIRECTORY: ../main-branch
+          WORKING_DIRECTORY: ./main-branch
           NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Run comparison benchmark
