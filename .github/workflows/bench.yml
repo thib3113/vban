@@ -40,7 +40,7 @@ jobs:
       - name: Install and Build main branch code
         uses: ./PR/.github/actions/setup-node
         with:
-          WORKING_DIRECTORY: ./main-branch
+          WORKING_DIRECTORY: ../main-branch
           NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Run comparison benchmark
