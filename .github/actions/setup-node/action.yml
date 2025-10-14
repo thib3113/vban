@@ -24,6 +24,7 @@ runs:
       with:
         # We run install manually to respect the working-directory
         run_install: false
+        package_json_file: "${{ inputs.WORKING_DIRECTORY }}/package.json"
 
     - name: Get pnpm store directory
       id: pnpm-cache
