@@ -1,73 +1,34 @@
 import { Buffer } from 'node:buffer';
-import type { VBANPacketTypes } from './packets/index.js';
-import {
-    ESubProtocol,
-    VBANAudioPacket,
-    VBANPacket,
-    VBANSerialPacket,
-    VBANServicePacket,
-    VBANServicePacketFactory,
-    VBANTEXTPacket
-} from './packets/index.js';
+import type { VBANPacketConstructorsTypes, VBANPacketTypes } from './packets/index.js';
+import { ESubProtocol, VBANAudioPacket, VBANPacket, VBANSerialPacket, VBANServicePacketFactory, VBANTEXTPacket } from './packets/index.js';
 import { VBANUnknownPacket } from './packets/VBANUnknownPacket/index.js';
-import { createDebugger } from './debugLogger.js';
-import { randomBytes } from 'node:crypto';
 
-const debug = createDebugger('VBANProtocolFactory');
+type constructorsTypes = VBANPacketConstructorsTypes | typeof VBANServicePacketFactory;
+const constructorsMaps = new Map<ESubProtocol, constructorsTypes>([
+    [ESubProtocol.AUDIO, VBANAudioPacket],
+    [ESubProtocol.SERIAL, VBANSerialPacket],
+    [ESubProtocol.TEXT, VBANTEXTPacket],
+    [ESubProtocol.SERVICE, VBANServicePacketFactory],
+    [ESubProtocol.UNKNOWN, VBANUnknownPacket]
+]);
+
 export class VBANProtocolFactory {
     public static processPacket(packet: Buffer): VBANPacketTypes {
-        const localDebug = debug.extend(randomBytes(1).toString('hex'));
-        localDebug('start processPacket');
         const { headers, data } = VBANPacket.parsePacket(packet);
 
-        try {
-            let objectPacket = VBANProtocolFactory.getConstructor(headers.sp)?.fromUDPPacket(headers, data);
-
-            if (objectPacket) {
-                return objectPacket;
-            }
-
-            return VBANUnknownPacket.fromUDPPacket(headers, data);
-        } finally {
-            localDebug('end processPacket');
-        }
+        return (
+            VBANProtocolFactory.getConstructor(headers.sp)?.fromUDPPacket(headers, data) ?? VBANUnknownPacket.fromUDPPacket(headers, data)
+        );
     }
 
-    public static getConstructor(
-        protocol: ESubProtocol
-    ): undefined | typeof VBANAudioPacket | typeof VBANSerialPacket | typeof VBANTEXTPacket | typeof VBANServicePacketFactory {
-        switch (protocol) {
-            case ESubProtocol.AUDIO:
-                return VBANAudioPacket;
-            case ESubProtocol.SERIAL:
-                return VBANSerialPacket;
-            case ESubProtocol.TEXT:
-                return VBANTEXTPacket;
-            case ESubProtocol.SERVICE:
-                return VBANServicePacketFactory;
-            default:
-                return undefined;
-        }
+    public static getConstructor(protocol: ESubProtocol): constructorsTypes {
+        return constructorsMaps.get(protocol) ?? VBANUnknownPacket;
     }
 
     public static toUDPBuffer(packet: Pick<VBANPacket, 'subProtocol'>): Buffer {
-        const localDebug = debug.extend(randomBytes(1).toString('hex'));
-        localDebug('start converting to UDP');
-        try {
-            switch (packet.subProtocol) {
-                case ESubProtocol.AUDIO:
-                    return VBANAudioPacket.toUDPPacket(packet as VBANAudioPacket);
-                case ESubProtocol.SERIAL:
-                    return VBANSerialPacket.toUDPPacket(packet as VBANSerialPacket);
-                case ESubProtocol.TEXT:
-                    return VBANTEXTPacket.toUDPPacket(packet as VBANTEXTPacket);
-                case ESubProtocol.SERVICE:
-                    return VBANServicePacketFactory.toUDPPacket(packet as VBANServicePacket);
-                default:
-                    throw new Error('unknown packet instance');
-            }
-        } finally {
-            localDebug('end converting to UDP');
-        }
+        const constructor = constructorsMaps.get(packet.subProtocol) ?? VBANUnknownPacket;
+
+        // forced, so user can pass a custom packet, and constructor will try to build it .
+        return constructor.toUDPPacket(packet as any);
     }
 }

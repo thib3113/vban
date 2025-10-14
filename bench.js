@@ -1,6 +1,6 @@
 import { Bench } from 'tinybench';
 import { Buffer } from 'node:buffer';
-import path from 'node:path';
+import path from 'node:path/posix';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -10,14 +10,6 @@ const __dirname = path.dirname(__filename);
 const CACHE_DIR = path.join(__dirname, '.github', '.cache');
 const CACHE_FILE = path.join(CACHE_DIR, 'bench.json');
 const SUMMARY_FILE = path.join(__dirname, 'benchmark-summary.md');
-
-function getPreviousResults() {
-    if (fs.existsSync(CACHE_FILE)) {
-        const rawData = fs.readFileSync(CACHE_FILE, 'utf-8');
-        return JSON.parse(rawData);
-    }
-    return {}; // Return empty object if no previous results
-}
 
 function formatResults(tasks) {
     const results = {};
@@ -93,7 +85,7 @@ async function runBenchmarks(VBANProtocolFactory) {
                 VBANProtocolFactory.processPacket(packetBuffer);
             })
             .add(`Conversion (${description})`, () => {
-                packet.toUDPPacket();
+                packet.constructor.toUDPPacket(packet);
             });
     }
 
@@ -115,10 +107,16 @@ async function main() {
         const MAIN_VBAN = await import(path.join(mainPath, 'index.mjs'));
 
         console.error('Benchmarking Main branch version...');
-        const mainResults = formatResults((await runBenchmarks(MAIN_VBAN.VBANProtocolFactory)).tasks);
+        const mainBench = await runBenchmarks(MAIN_VBAN.VBANProtocolFactory);
+        const mainResults = formatResults(mainBench.tasks);
+
+        console.table(mainBench.table());
 
         console.error('Benchmarking PR branch version...');
-        const prResults = formatResults((await runBenchmarks(PR_VBAN.VBANProtocolFactory)).tasks);
+        const PRBench = await runBenchmarks(PR_VBAN.VBANProtocolFactory);
+        const prResults = formatResults(PRBench.tasks);
+
+        console.table(PRBench.table());
 
         const summary = generateComparisonSummary(mainResults, prResults);
         console.log(summary); // For local viewing

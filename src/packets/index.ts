@@ -1,8 +1,8 @@
-import type { VBANAudioPacket } from './VBANAudioPacket/index.js';
-import type { VBANSerialPacket } from './VBANSerialPacket/index.js';
-import type { VBANTEXTPacket } from './VBANTXTPacket/index.js';
-import type { VBANServicePacket } from './VBANServicePacket/index.js';
-import type { VBANUnknownPacket } from './VBANUnknownPacket/index.js';
+import { VBANAudioPacket } from './VBANAudioPacket/index.js';
+import { VBANSerialPacket } from './VBANSerialPacket/index.js';
+import { VBANTEXTPacket } from './VBANTXTPacket/index.js';
+import { VBANServicePacket } from './VBANServicePacket/index.js';
+import { VBANUnknownPacket } from './VBANUnknownPacket/index.js';
 
 export * from './VBANAudioPacket/index.js';
 export * from './VBANSerialPacket/index.js';
@@ -15,4 +15,8 @@ export * from './IVBANHeaderCommon.js';
 export * from './VBANPacket.js';
 export * from './VBANSpecs.js';
 
-export type VBANPacketTypes = VBANAudioPacket | VBANSerialPacket | VBANTEXTPacket | VBANServicePacket | VBANUnknownPacket;
+const VBANPacketClasses = [VBANAudioPacket, VBANSerialPacket, VBANTEXTPacket, VBANServicePacket, VBANUnknownPacket] as const;
+
+export type VBANPacketConstructorsTypes = (typeof VBANPacketClasses)[number];
+
+export type VBANPacketTypes = InstanceType<VBANPacketConstructorsTypes>;

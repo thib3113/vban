@@ -83,10 +83,6 @@ importers:
       typescript-eslint:
         specifier: 8.46.0
         version: 8.46.0(eslint@9.37.0)(typescript@5.9.3)
-    optionalDependencies:
-      debug:
-        specifier: ^4.4.3
-        version: 4.4.3
 
 packages:
 

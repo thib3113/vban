@@ -4,8 +4,6 @@ export const PACKET_IDENTIFICATION = 'VBAN';
 
 export const SUB_PROTOCOL_MASK = 0b11100000;
 
-export const HEADER_LENGTH = 28;
-
 /**
  * the stream name is limited to 16 bytes
  */
@@ -171,3 +169,10 @@ export const sampleRates: Record<number, number> = {
     30: 0,
     31: 0
 };
+
+export const sampleRatesMap = new Map<number, number>();
+export const sampleRatesMapIndex = new Map<number, number>();
+for (const [index, rate] of Object.entries(sampleRates)) {
+    sampleRatesMapIndex.set(rate, Number(index));
+    sampleRatesMap.set(Number(index), rate);
+}

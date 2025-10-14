@@ -24,9 +24,6 @@
       "default": "./lib/index.cjs"
     }
   },
-  "optionalDependencies": {
-    "debug": "^4.4.3"
-  },
   "devDependencies": {
     "@eslint/js": "9.37.0",
     "@jest/globals": "30.2.0",

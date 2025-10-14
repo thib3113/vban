@@ -2,20 +2,19 @@ import { describe, expect, it } from '@jest/globals';
 import { Buffer } from 'node:buffer';
 import {
     ESubProtocol,
-    HEADER_LENGTH,
+    VBAN_HEADER_LENGTH,
     IVBANHeaderCommon,
     PACKET_IDENTIFICATION,
     STREAM_NAME_LENGTH,
     VBAN_DATA_MAX_SIZE,
-    VBANPacket,
-    VBANProtocolFactory
+    VBANPacket
 } from '../src/index.js';
 
 type TestHeaderProps = Omit<IVBANHeaderCommon, 'sr'> & { srIndex: number; frameCounter: number };
 
 // Helper function to create a header buffer for tests
 const createTestHeaderBuffer = (props: TestHeaderProps): Buffer => {
-    const buffer = Buffer.alloc(HEADER_LENGTH);
+    const buffer = Buffer.alloc(VBAN_HEADER_LENGTH);
 
     // VBAN identification
     buffer.write(PACKET_IDENTIFICATION, 0, 'ascii');
@@ -141,11 +140,11 @@ describe('VBANPacket', () => {
             const udpPacket = VBANPacket['convertToUDPPacket'](headers, dataToTest.content);
 
             // Verify the packet structure
-            expect(udpPacket.length).toBe(HEADER_LENGTH + data.length);
+            expect(udpPacket.length).toBe(VBAN_HEADER_LENGTH + data.length);
             expect(udpPacket.toString('ascii', 0, 4)).toBe(PACKET_IDENTIFICATION);
 
             // Re-parse the generated packet to verify its headers
-            const parsedHeaders = VBANPacket.parsePacketHeader(udpPacket.subarray(0, HEADER_LENGTH));
+            const parsedHeaders = VBANPacket.parsePacketHeader(udpPacket.subarray(0, VBAN_HEADER_LENGTH));
 
             expect(parsedHeaders.sp).toBe(headers.sp);
             expect(parsedHeaders.srIndex).toBe(expectedSrIndex);
@@ -156,7 +155,7 @@ describe('VBANPacket', () => {
             expect(parsedHeaders.frameCounter).toBe(headers.frameCounter);
 
             // Verify the data payload
-            const parsedData = udpPacket.subarray(HEADER_LENGTH);
+            const parsedData = udpPacket.subarray(VBAN_HEADER_LENGTH);
             expect(parsedData).toEqual(dataToTest.content);
         });
 
