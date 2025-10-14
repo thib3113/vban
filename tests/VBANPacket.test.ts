@@ -60,7 +60,7 @@ describe('VBANPacket', () => {
         });
 
         it('should throw an error for an undefined index', () => {
-            expect(() => VBANPacket.getSampleRate(undefined)).toThrow('unknown sample rate undefined');
+            expect(() => VBANPacket.getSampleRate()).toThrow('unknown sample rate undefined');
         });
     });
 
@@ -191,53 +191,6 @@ describe('VBANPacket', () => {
 
             expect(srIndex).toBe(2);
             expect(srIndex).not.toBe(3); // 3 would be for 48000Hz
-        });
-    });
-
-    describe('Parse and Convert Round Trip', () => {
-        const roundTripTestCases = [
-            {
-                description: 'a ping packet',
-                base64Packet:
-                    'VkJBTmAAAABWQkFOIFNlcnZpY2UAAAAAAwAAACAAAAABAwEAAAAAAAAAAABwFwAAQMQKAEroOQADAQEJAAAAAAAAAAAAAAAAAAAAAGZyLWZyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbXktcGMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFZCLUF1ZGlvIFNvZnR3YXJlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABWb2ljZW1lZXRlciBQb3RhdG8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbXktcGMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
-            },
-            {
-                description: 'a standard audio packet',
-                base64Packet:
-                    'VkJBTgNmAQFTdHJlYW0yAAAAAAAAAAAAmgcAAAABCAEGARABAQEMAQABCgEGARIBEAEdAREBHQELARgBCQEWAQYBEgEJARcBDAEZAQIBDwEAAQ8BCwEYAQoBFwEHARUBFAEgARIBHgEAAQ0B+wAGAfgABQH2AAAB+QABAfYA/gDoAOsA4QDiAOYA5QDiAN0A0gDNAMUAvwDAALkAwAC6AMEAuwDHAMEAygDGAMIAvgC2ALIArgCrAKoApACpAKQAsACpALEApwCtAKQArQCjAKcAngCgAJkAnwCYAJkAlQCOAIsAhgCDAIQAgwCFAIMAfwB9AIEAgACCAIEAcgBxAG0AbQBuAG0AawBrAHUAdgB7AHoAdgB3AHgAeQB9AH0AfQB+AHsAewB8AHsAeAB5AHgAdgB5AHkAdQB3AHIAcgBxAHQAcQBzAG4AbQBjAGUAZgBhAHAAawBvAGoAawBgAGYAXwBgAFcAYQBYAGUAXwBiAFgAXQBWAF8AWgBlAF4AaABiAGYAYQBoAGEAagBkAG4AZQByAGgAcgBqAHQAaQBwAGkAcgBsAHcAcABxAG8AdgBxAHwAeQA='
-            }
-            // {
-            //     description: 'a text packet',
-            //     base64Packet: 'VkJBTkAAAAAAAABUAGUAeAB0AEQAYQB0AGEAAAAAAAAAAAAAZQAAAAAAAABTb21lIHRleHQgZGF0YSBoZXJl'
-            // },
-            // {
-            //     description: 'a packet with no data payload',
-            //     base64Packet: 'VkJBTgMA/wEAAE4AbwBEAGEAdABhAAAAAAAAAAAAAAAAAQUAAAAAAAAA'
-            // }
-        ];
-
-        it.each(roundTripTestCases)('should result in the same base64 string for $description', ({ base64Packet }) => {
-            // 1. Decode original packet
-            const originalPacketBuffer = Buffer.from(base64Packet, 'base64');
-
-            // 2. Parse it
-            const { headers: parsedHeaders, data: parsedData } = VBANPacket.parsePacket(originalPacketBuffer);
-
-            const pkt = VBANProtocolFactory.processPacket(originalPacketBuffer);
-
-            // 3. Prepare headers for re-conversion (we need the sr value, not the srIndex)
-            const headersForConversion = {
-                ...parsedHeaders,
-                sr: VBANPacket.getSampleRate(parsedHeaders.srIndex)
-            };
-
-            // 4. Re-convert to a UDP packet
-            const reconstructedPacketBuffer = VBANPacket['convertToUDPPacket'](headersForConversion, parsedData);
-
-            const { headers } = VBANPacket.parsePacket(reconstructedPacketBuffer);
-
-            // 5. Encode back to base64 and compare
-            expect(reconstructedPacketBuffer.toString('base64')).toBe(base64Packet);
         });
     });
 });

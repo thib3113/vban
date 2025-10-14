@@ -101,7 +101,6 @@ async function runBenchmarks(VBANProtocolFactory, benchSuffix = '') {
 
 async function main() {
     const args = process.argv.slice(2);
-    const shouldUpdateCache = args.includes('--update-cache');
     const isComparison = args.includes('--compare');
 
     if (isComparison) {

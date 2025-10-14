@@ -221,7 +221,7 @@ describe('VBANServer.test.ts', () => {
                 const fn = args.pop();
 
                 if (typeof fn !== 'function') {
-                    throw new Error(`unrecognized service function: ${fn}`);
+                    throw new TypeError(`unrecognized service function: ${fn}`);
                 }
 
                 fn(null);
@@ -243,13 +243,13 @@ describe('VBANServer.test.ts', () => {
                 isReply: false
             });
 
-            const err = new Error();
+            const err = new Error('my error');
 
             socketMock.send.mockImplementationOnce((...args) => {
                 const fn = args.pop();
 
                 if (typeof fn !== 'function') {
-                    throw new Error(`unrecognized service function: ${fn}`);
+                    throw new TypeError(`unrecognized service function: ${fn}`);
                 }
 
                 fn(err);
