@@ -41,6 +41,7 @@ export class VBANTEXTPacket extends VBANPacket {
     public text: string;
     /**
      * you can access the raw dataBuffer (if available) to try another decoding
+     * but will not be sent
      */
     public dataBuffer?: Buffer;
 

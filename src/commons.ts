@@ -123,7 +123,7 @@ export function bufferToHex(buffer: Buffer) {
             hexString += ' ';
         }
     }
-    return hexString;
+    return hexString?.toUpperCase();
 }
 
 export function prepareStringForPacket(str: string, maxLength: number): string {
