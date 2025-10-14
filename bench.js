@@ -113,10 +113,10 @@ async function main() {
         const MAIN_VBAN = await import(path.join(mainPath, 'index.mjs'));
 
         console.error('Benchmarking Main branch version...');
-        const mainResults = formatResults(await runBenchmarks(MAIN_VBAN.VBANProtocolFactory, 'main'));
+        const mainResults = formatResults((await runBenchmarks(MAIN_VBAN.VBANProtocolFactory, 'main')).tasks);
 
         console.error('Benchmarking PR branch version...');
-        const prResults = await runBenchmarks(PR_VBAN.VBANProtocolFactory, 'current');
+        const prResults = formatResults((await runBenchmarks(PR_VBAN.VBANProtocolFactory, 'current')).tasks);
 
         const summary = generateComparisonSummary(mainResults, prResults);
         console.log(summary); // For local viewing
