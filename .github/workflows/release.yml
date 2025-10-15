@@ -37,7 +37,7 @@ jobs:
       - run: npm install
         env:
           CI: true
-      - run: npm publish --access public
+      - run: npm --ddd publish
         name: publish on npm
 #        env:
 #          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
