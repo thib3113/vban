@@ -34,7 +34,12 @@ jobs:
         with:
           node-version: lts/*
           registry-url: 'https://registry.npmjs.org'
-      - run: npm install
+      - name: Update npm
+        shell: bash
+        run: |
+          npm i -g npm@latest
+          npm --version
+          npm install
         env:
           CI: true
       - run: npm --ddd publish
