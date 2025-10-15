@@ -4,8 +4,9 @@ on:
     types: [created]
 
 permissions:
-  id-token: write  # Required for OIDC
+  id-token: write
   contents: read
+  checks: write
 
 jobs:
   build:
