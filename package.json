@@ -87,5 +87,5 @@
     "MT-128",
     "UDP"
   ],
-  "packageManager": "pnpm@10.18.2"
+  "packageManager": "pnpm@10.18.3"
 }
