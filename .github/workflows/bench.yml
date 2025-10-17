@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout PR branch (HEAD)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: './PR'
 
@@ -30,7 +30,7 @@ jobs:
           WORKING_DIRECTORY: './PR'
 
       - name: Checkout base branch (main) into a separate directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.base_ref }} # This is typically 'main'
           path: './main-branch'
