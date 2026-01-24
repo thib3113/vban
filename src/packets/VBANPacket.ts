@@ -2,8 +2,8 @@ import { Buffer } from 'node:buffer';
 import { ESubProtocol } from './ESubProtocol.js';
 import { IVBANHeaderCommon } from './IVBANHeaderCommon.js';
 import {
-    cleanPacketString,
     PACKET_IDENTIFICATION,
+    PACKET_IDENTIFICATION_UINT32,
     sampleRates,
     sampleRatesMapIndex,
     STREAM_NAME_LENGTH,
@@ -44,7 +44,7 @@ export class VBANPacket {
     public static parsePacketHeader(headersBuffer: Buffer): IVBANHeaderCommon {
         const headers: Partial<IVBANHeaderCommon> = {};
 
-        if (headersBuffer.toString('ascii', 0, PACKET_IDENTIFICATION.length) !== PACKET_IDENTIFICATION) {
+        if (headersBuffer.length < 4 || headersBuffer.readUInt32BE(0) !== PACKET_IDENTIFICATION_UINT32) {
             throw new Error('Invalid Header');
         }
 
@@ -67,7 +67,12 @@ export class VBANPacket {
         headers.srIndex = sr_sp & 0b00011111; // 5 last bits
 
         // Stream Name (16 bytes)
-        headers.streamName = cleanPacketString(headersBuffer.toString('ascii', 8, 8 + STREAM_NAME_LENGTH));
+        const streamNameEnd = 8 + STREAM_NAME_LENGTH;
+        let nullTerminatorIndex = headersBuffer.indexOf(0, 8);
+        if (nullTerminatorIndex === -1 || nullTerminatorIndex > streamNameEnd) {
+            nullTerminatorIndex = streamNameEnd;
+        }
+        headers.streamName = headersBuffer.toString('ascii', 8, nullTerminatorIndex);
 
         // Frame Counter (32 bits)
         headers.frameCounter = headersBuffer.readUInt32LE(24);
@@ -126,7 +131,9 @@ export class VBANPacket {
             );
         }
 
-        const finalBuffer = Buffer.alloc(VBAN_HEADER_LENGTH + data.length);
+        // Use allocUnsafe for performance as the buffer is fully overwritten below.
+        // This avoids zero-filling the memory.
+        const finalBuffer = Buffer.allocUnsafe(VBAN_HEADER_LENGTH + data.length);
 
         let offset = 0;
 
