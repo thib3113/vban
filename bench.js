@@ -16,8 +16,8 @@ function formatResults(tasks) {
     for (const task of tasks) {
         if (task.result) {
             results[task.name] = {
-                hz: task.result.hz,
-                rme: task.result.rme
+                hz: task.result.throughput.mean,
+                rme: task.result.throughput.rme
             };
         }
     }
