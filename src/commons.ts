@@ -110,21 +110,19 @@ export function dec2bin(dec: number) {
     return ((dec >>> 0).toString(2) || '').padStart(8, '0');
 }
 
+const HEX_TABLE = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, '0').toUpperCase());
+
 export function bufferToHex(buffer: Buffer) {
     if (!Buffer.isBuffer(buffer)) {
         throw new TypeError('need to be a buffer');
     }
-
-    let hexString = '';
-    for (let i = 0; i < buffer.length; i++) {
-        const hex = buffer[i].toString(16).padStart(2, '0');
-        hexString += hex;
-
-        if (i < buffer.length - 1) {
-            hexString += ' ';
-        }
+    const len = buffer.length;
+    if (len === 0) return '';
+    const parts = new Array(len);
+    for (let i = 0; i < len; i++) {
+        parts[i] = HEX_TABLE[buffer[i]];
     }
-    return hexString?.toUpperCase();
+    return parts.join(' ');
 }
 
 export function prepareStringForPacket(str: string, maxLength: number): string {
