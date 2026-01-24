@@ -2,7 +2,6 @@ import { Buffer } from 'node:buffer';
 import { ESubProtocol } from './ESubProtocol.js';
 import { IVBANHeaderCommon } from './IVBANHeaderCommon.js';
 import {
-    cleanPacketString,
     PACKET_IDENTIFICATION,
     sampleRates,
     sampleRatesMapIndex,
@@ -67,7 +66,12 @@ export class VBANPacket {
         headers.srIndex = sr_sp & 0b00011111; // 5 last bits
 
         // Stream Name (16 bytes)
-        headers.streamName = cleanPacketString(headersBuffer.toString('ascii', 8, 8 + STREAM_NAME_LENGTH));
+        const streamNameEnd = 8 + STREAM_NAME_LENGTH;
+        let nullTerminatorIndex = headersBuffer.indexOf(0, 8);
+        if (nullTerminatorIndex === -1 || nullTerminatorIndex > streamNameEnd) {
+            nullTerminatorIndex = streamNameEnd;
+        }
+        headers.streamName = headersBuffer.toString('ascii', 8, nullTerminatorIndex);
 
         // Frame Counter (32 bits)
         headers.frameCounter = headersBuffer.readUInt32LE(24);
