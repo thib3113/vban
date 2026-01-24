@@ -39,10 +39,12 @@ function generateComparisonSummary(mainResults, prResults) {
         if (main) {
             mainValue = `${Math.round(main.hz).toLocaleString('en-US')} ops/sec`;
             const change = ((pr.hz - main.hz) / main.hz) * 100;
-            if (change > 2) {
-                changeStr = `🚀 **+${change.toFixed(2)}%**`;
-            } else if (change < -2) {
-                changeStr = `🐢 **${change.toFixed(2)}%**`;
+            if (Math.abs(change) > pr.rme) {
+                if (change > 0) {
+                    changeStr = `🚀 **+${change.toFixed(2)}%**`;
+                } else {
+                    changeStr = `🐢 **${change.toFixed(2)}%**`;
+                }
             }
         }
         summary += `| ${name} | \`${mainValue}\` | \`${prValue}\` | ${changeStr} |\n`;
@@ -73,7 +75,8 @@ const testPackets = [
 
 async function runBenchmarks(VBANProtocolFactory) {
     const bench = new Bench({
-        iterations: 100000
+        warmupTime: 1000,
+        time: 2500
     });
 
     for (const { description, base64Packet } of testPackets) {
