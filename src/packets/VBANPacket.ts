@@ -126,7 +126,7 @@ export class VBANPacket {
             );
         }
 
-        const finalBuffer = Buffer.alloc(VBAN_HEADER_LENGTH + data.length);
+        const finalBuffer = Buffer.allocUnsafe(VBAN_HEADER_LENGTH + data.length);
 
         let offset = 0;
 
