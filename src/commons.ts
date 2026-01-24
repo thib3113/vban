@@ -109,21 +109,22 @@ export function dec2bin(dec: number) {
     return ((dec >>> 0).toString(2) || '').padStart(8, '0');
 }
 
+const HEX_STRINGS: string[] = [];
+for (let i = 0; i < 256; i++) {
+    HEX_STRINGS[i] = i.toString(16).padStart(2, '0').toUpperCase();
+}
+
 export function bufferToHex(buffer: Buffer) {
     if (!Buffer.isBuffer(buffer)) {
         throw new TypeError('need to be a buffer');
     }
 
-    let hexString = '';
-    for (let i = 0; i < buffer.length; i++) {
-        const hex = buffer[i].toString(16).padStart(2, '0');
-        hexString += hex;
-
-        if (i < buffer.length - 1) {
-            hexString += ' ';
-        }
+    const length = buffer.length;
+    const parts = new Array(length);
+    for (let i = 0; i < length; i++) {
+        parts[i] = HEX_STRINGS[buffer[i]];
     }
-    return hexString?.toUpperCase();
+    return parts.join(' ');
 }
 
 export function prepareStringForPacket(str: string, maxLength: number): string {
