@@ -73,7 +73,9 @@ const testPackets = [
 
 async function runBenchmarks(VBANProtocolFactory) {
     const bench = new Bench({
-        iterations: 100000
+        time: 2000,
+        warmupTime: 1000,
+        warmupIterations: 5000
     });
 
     for (const { description, base64Packet } of testPackets) {
