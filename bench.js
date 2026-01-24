@@ -40,11 +40,12 @@ function generateComparisonSummary(mainResults, prResults) {
             mainValue = `${Math.round(main.hz).toLocaleString('en-US')} ops/sec`;
             const change = ((pr.hz - main.hz) / main.hz) * 100;
             if (Math.abs(change) > pr.rme) {
-                if (change > 0) {
-                    changeStr = `🚀 **+${change.toFixed(2)}%**`;
-                } else {
-                    changeStr = `🐢 **${change.toFixed(2)}%**`;
+                let prefix = '';
+                if (Math.abs(change) > 1) {
+                    prefix = change > 0 ? '🚀 ' : '🐢 ';
                 }
+                const sign = change > 0 ? '+' : '';
+                changeStr = `${prefix}**${sign}${change.toFixed(2)}%**`;
             }
         }
         summary += `| ${name} | \`${mainValue}\` | \`${prValue}\` | ${changeStr} |\n`;
