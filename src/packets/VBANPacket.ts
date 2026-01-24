@@ -126,6 +126,8 @@ export class VBANPacket {
             );
         }
 
+        // Use allocUnsafe for performance as the buffer is fully overwritten below.
+        // This avoids zero-filling the memory.
         const finalBuffer = Buffer.allocUnsafe(VBAN_HEADER_LENGTH + data.length);
 
         let offset = 0;
