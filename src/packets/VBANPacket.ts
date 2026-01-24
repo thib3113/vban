@@ -4,6 +4,7 @@ import { IVBANHeaderCommon } from './IVBANHeaderCommon.js';
 import {
     cleanPacketString,
     PACKET_IDENTIFICATION,
+    PACKET_IDENTIFICATION_UINT32,
     sampleRates,
     sampleRatesMapIndex,
     STREAM_NAME_LENGTH,
@@ -44,7 +45,7 @@ export class VBANPacket {
     public static parsePacketHeader(headersBuffer: Buffer): IVBANHeaderCommon {
         const headers: Partial<IVBANHeaderCommon> = {};
 
-        if (headersBuffer.toString('ascii', 0, PACKET_IDENTIFICATION.length) !== PACKET_IDENTIFICATION) {
+        if (headersBuffer.length < 4 || headersBuffer.readUInt32BE(0) !== PACKET_IDENTIFICATION_UINT32) {
             throw new Error('Invalid Header');
         }
 

@@ -1,6 +1,7 @@
 import { Buffer } from 'node:buffer';
 
 export const PACKET_IDENTIFICATION = 'VBAN';
+export const PACKET_IDENTIFICATION_UINT32 = 0x5642414e;
 
 export const SUB_PROTOCOL_MASK = 0b11100000;
 
