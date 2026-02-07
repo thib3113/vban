@@ -159,7 +159,11 @@ export class VBANPacket {
         offset = finalBuffer.writeUInt8(headers.part3, offset);
 
         // Écriture du nom du stream
-        offset += finalBuffer.write(headers.streamName.padEnd(STREAM_NAME_LENGTH, '\0'), offset, 'ascii');
+        const streamNameWritten = finalBuffer.write(headers.streamName, offset, STREAM_NAME_LENGTH, 'ascii');
+        if (streamNameWritten < STREAM_NAME_LENGTH) {
+            finalBuffer.fill(0, offset + streamNameWritten, offset + STREAM_NAME_LENGTH);
+        }
+        offset += STREAM_NAME_LENGTH;
 
         // Écriture du compteur
         finalBuffer.writeUInt32LE(headers.frameCounter ?? 1, offset);
