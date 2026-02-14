@@ -47,7 +47,7 @@
     "tinybench": "^6.0.0",
     "ts-jest": "29.4.5",
     "ts-node": "10.9.2",
-    "typedoc": "0.28.14",
+    "typedoc": "0.28.16",
     "typescript": "5.9.3",
     "typescript-eslint": "8.46.3"
   },
