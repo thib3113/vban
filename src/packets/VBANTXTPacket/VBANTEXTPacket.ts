@@ -1,7 +1,7 @@
 import { VBANPacket } from '../VBANPacket.js';
 import { Buffer } from 'node:buffer';
 import { ESubProtocol } from '../ESubProtocol.js';
-import { BITS_SPEEDS, EFormatBit } from '../../commons.js';
+import { BITS_SPEEDS, EFormatBit, bitsSpeedsMapIndex } from '../../commons.js';
 import { ETextEncoding } from './ETextEncoding.js';
 import { IVBANHeaderTEXT } from './IVBANHeaderTEXT.js';
 import { IVBANHeaderCommon } from '../IVBANHeaderCommon.js';
@@ -73,12 +73,7 @@ export class VBANTEXTPacket extends VBANPacket {
             ? Buffer.from(packet.text, VBANTEXTPacket.getEncoding(packet.encoding))
             : (packet.dataBuffer ?? Buffer.from(''));
 
-        const bpsId =
-            Number(
-                Object.entries(BITS_SPEEDS)
-                    .find(([, bps]) => bps && bps === packet.bps)
-                    ?.shift()
-            ) || 0;
+        const bpsId = bitsSpeedsMapIndex.get(packet.bps) || 0;
 
         return this.convertToUDPPacket(
             {
