@@ -175,3 +175,21 @@ for (const [index, rate] of Object.entries(sampleRates)) {
     sampleRatesMapIndex.set(rate, Number(index));
     sampleRatesMap.set(Number(index), rate);
 }
+
+export const bitsSpeedsMapIndex = new Map<number, number>();
+for (const [index, rate] of Object.entries(BITS_SPEEDS)) {
+    const rateNum = Number(rate);
+    const indexNum = Number(index);
+    if (rateNum !== 0 && !bitsSpeedsMapIndex.has(rateNum)) {
+        bitsSpeedsMapIndex.set(rateNum, indexNum);
+    }
+}
+
+export const mbpsSpeedsMapIndex = new Map<number, number>();
+for (const [index, rate] of Object.entries(MBPS_SPEEDS)) {
+    const rateNum = Number(rate);
+    const indexNum = Number(index);
+    if (rateNum !== 0 && !mbpsSpeedsMapIndex.has(rateNum)) {
+        mbpsSpeedsMapIndex.set(rateNum, indexNum);
+    }
+}
