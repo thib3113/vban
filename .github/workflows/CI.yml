@@ -32,7 +32,7 @@ jobs:
           test-command: pnpm run ci:test:coverage
           coverage-comment: false
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: coverage
           path: |
@@ -61,7 +61,7 @@ jobs:
         env:
           CI: true
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: eslint-coverage
           path: ./coverage/eslint-report.json
@@ -73,11 +73,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: coverage
           path: ./coverage/
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: eslint-coverage
           path: ./coverage/
