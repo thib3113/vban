@@ -171,25 +171,27 @@ export const sampleRates: Record<number, number> = {
 
 export const sampleRatesMap = new Map<number, number>();
 export const sampleRatesMapIndex = new Map<number, number>();
-for (const [index, rate] of Object.entries(sampleRates)) {
-    sampleRatesMapIndex.set(rate, Number(index));
-    sampleRatesMap.set(Number(index), rate);
+for (let i = 0; ; i++) {
+    const rate = sampleRates[i];
+    if (rate === undefined) break;
+    sampleRatesMapIndex.set(rate, i);
+    sampleRatesMap.set(i, rate);
 }
 
 export const bitsSpeedsMapIndex = new Map<number, number>();
-for (const [index, rate] of Object.entries(BITS_SPEEDS)) {
-    const rateNum = Number(rate);
-    const indexNum = Number(index);
-    if (rateNum !== 0 && !bitsSpeedsMapIndex.has(rateNum)) {
-        bitsSpeedsMapIndex.set(rateNum, indexNum);
+for (let i = 0; ; i++) {
+    const rate = BITS_SPEEDS[i];
+    if (rate === undefined) break;
+    if (rate !== 0 && !bitsSpeedsMapIndex.has(rate)) {
+        bitsSpeedsMapIndex.set(rate, i);
     }
 }
 
 export const mbpsSpeedsMapIndex = new Map<number, number>();
-for (const [index, rate] of Object.entries(MBPS_SPEEDS)) {
-    const rateNum = Number(rate);
-    const indexNum = Number(index);
-    if (rateNum !== 0 && !mbpsSpeedsMapIndex.has(rateNum)) {
-        mbpsSpeedsMapIndex.set(rateNum, indexNum);
+for (let i = 0; ; i++) {
+    const rate = MBPS_SPEEDS[i];
+    if (rate === undefined) break;
+    if (rate !== 0 && !mbpsSpeedsMapIndex.has(rate)) {
+        mbpsSpeedsMapIndex.set(rate, i);
     }
 }
