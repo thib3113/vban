@@ -1,6 +1,6 @@
 import { VBANPacket } from '../VBANPacket.js';
 import { ESubProtocol } from '../ESubProtocol.js';
-import { BITS_SPEEDS, EFormatBit, serialStopModes, bitsSpeedsMapIndex } from '../../commons.js';
+import { BITS_SPEEDS, EFormatBit, bitsSpeedsMapIndex, serialStopModesMap, serialStopModesMapIndex } from '../../commons.js';
 import { ISerialBitMode } from './ISerialBitMode.js';
 import { ESerialStreamType } from './ESerialStreamType.js';
 import { IVBANHeaderSerial } from './IVBANHeaderSerial.js';
@@ -71,7 +71,7 @@ export class VBANSerialPacket extends VBANPacket {
     public static toUDPPacket(packet: VBANSerialPacket): Buffer {
         let part1 = 0;
 
-        const mode = serialStopModes.find((m) => m.stop === packet.bitMode.stop)?.mode;
+        const mode = serialStopModesMapIndex.get(packet.bitMode.stop);
         if (mode === undefined) {
             throw new Error(`fail to found mode for stop ${packet.bitMode.stop}`);
         }
@@ -118,7 +118,7 @@ export class VBANSerialPacket extends VBANPacket {
 
         const stopMode = bitModeRaw & 0b00000011;
 
-        const stop = serialStopModes.find((m) => m.mode === stopMode)?.stop ?? null;
+        const stop = serialStopModesMap.get(stopMode) ?? null;
 
         const start = (bitModeRaw & 0b00000100) === 4;
         const parity = (bitModeRaw & 0b00001000) === 8;
