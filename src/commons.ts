@@ -195,3 +195,12 @@ for (let i = 0; ; i++) {
         mbpsSpeedsMapIndex.set(rate, i);
     }
 }
+
+export const serialStopModesMap = new Map<number, number | null>();
+export const serialStopModesMapIndex = new Map<number | null, number>();
+for (let i = 0; ; i++) {
+    const mode = serialStopModes[i];
+    if (mode === undefined) break;
+    serialStopModesMap.set(mode.mode, mode.stop);
+    serialStopModesMapIndex.set(mode.stop, mode.mode);
+}
