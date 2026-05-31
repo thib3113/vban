@@ -8,6 +8,8 @@ import { EServicePINGFeatures } from '../EServicePINGFeatures.js';
 import { cleanPacketString, prepareStringForPacket } from '../../../commons.js';
 import { IVBANHeaderCommon } from '../../IVBANHeaderCommon.js';
 
+const PING_FEATURES_VALUES = Object.values(EServicePINGFeatures).filter((v) => typeof v === 'number') as EServicePINGFeatures[];
+
 export class VBANPingPacket extends VBANServicePacket {
     public data: IPacketPingData;
     constructor(headers: IVBANHeaderService, data: IPacketPingData) {
@@ -21,44 +23,64 @@ export class VBANPingPacket extends VBANServicePacket {
         const serviceFunction = fn & 0b01111111;
         const isReply = (fn & 0b10000000) >= 1;
 
-        let currentByte = 0;
-        const getXNextBytes = (size: number): Buffer => {
-            const b = dataBuffer.subarray(currentByte, currentByte + size);
-            currentByte += size;
-            return b;
-        };
+        let offset = 0;
 
-        const bitType = getXNextBytes(4).readUInt32LE();
+        const bitType = dataBuffer.readUInt32LE(offset);
+        offset += 4;
         const applicationType = EServicePINGApplicationType[bitType] ? bitType : EServicePINGApplicationType.UNKNOWN;
-        const bitFeature = getXNextBytes(4).readUInt32LE();
-        const features = (
-            Object.entries(EServicePINGFeatures).filter(([k]) => Number.isNaN(Number(k))) as Array<[string, EServicePINGFeatures]>
-        )
-            .filter(([, v]) => bitFeature & v)
-            .map(([, v]) => v);
-        const bitFeatureEx = getXNextBytes(4).readUInt32LE();
-        const PreferredRate = getXNextBytes(4).readUInt32LE();
-        const minRate = getXNextBytes(4).readUInt32LE();
-        const maxRate = getXNextBytes(4).readUInt32LE();
-        const colorRGB = getXNextBytes(4).readUInt32LE();
+
+        const bitFeature = dataBuffer.readUInt32LE(offset);
+        offset += 4;
+        const features: EServicePINGFeatures[] = [];
+        for (let i = 0; i < PING_FEATURES_VALUES.length; i++) {
+            const value = PING_FEATURES_VALUES[i];
+            if ((bitFeature & value) === value) {
+                features.push(value);
+            }
+        }
+
+        const bitFeatureEx = dataBuffer.readUInt32LE(offset);
+        offset += 4;
+        const PreferredRate = dataBuffer.readUInt32LE(offset);
+        offset += 4;
+        const minRate = dataBuffer.readUInt32LE(offset);
+        offset += 4;
+        const maxRate = dataBuffer.readUInt32LE(offset);
+        offset += 4;
+        const colorRGB = dataBuffer.readUInt32LE(offset);
+        offset += 4;
         const color = {
             blue: colorRGB & 255,
             green: (colorRGB >> 8) & 255,
             red: (colorRGB >> 16) & 255
         };
-        const nVersion = getXNextBytes(4).readUInt32LE();
-        const GPSPosition = cleanPacketString(getXNextBytes(8).toString('ascii'));
-        const userPosition = cleanPacketString(getXNextBytes(8).toString('ascii'));
-        const langCode = cleanPacketString(getXNextBytes(8).toString('ascii'));
-        const reservedASCII = cleanPacketString(getXNextBytes(8).toString('ascii'));
-        const reservedEx = cleanPacketString(getXNextBytes(64).toString('ascii'));
-        const reservedEx2 = cleanPacketString(getXNextBytes(36).toString('ascii'));
-        const deviceName = cleanPacketString(getXNextBytes(64).toString('ascii'));
-        const manufacturerName = cleanPacketString(getXNextBytes(64).toString('ascii'));
-        const applicationName = cleanPacketString(getXNextBytes(64).toString('ascii'));
-        const hostnameASCII = cleanPacketString(getXNextBytes(64).toString('ascii'));
-        const userName = cleanPacketString(getXNextBytes(128).toString('utf8'));
-        const userComment = cleanPacketString(getXNextBytes(128).toString('utf8'));
+        const nVersion = dataBuffer.readUInt32LE(offset);
+        offset += 4;
+
+        const GPSPosition = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 8));
+        offset += 8;
+        const userPosition = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 8));
+        offset += 8;
+        const langCode = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 8));
+        offset += 8;
+        const reservedASCII = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 8));
+        offset += 8;
+        const reservedEx = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 64));
+        offset += 64;
+        const reservedEx2 = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 36));
+        offset += 36;
+        const deviceName = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 64));
+        offset += 64;
+        const manufacturerName = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 64));
+        offset += 64;
+        const applicationName = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 64));
+        offset += 64;
+        const hostnameASCII = cleanPacketString(dataBuffer.toString('ascii', offset, offset + 64));
+        offset += 64;
+        const userName = cleanPacketString(dataBuffer.toString('utf8', offset, offset + 128));
+        offset += 128;
+        const userComment = cleanPacketString(dataBuffer.toString('utf8', offset, offset + 128));
+        offset += 128;
 
         //extract information
         const data: IPacketPingData = {
