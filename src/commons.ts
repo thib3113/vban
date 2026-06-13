@@ -130,7 +130,8 @@ export function prepareStringForPacket(str: string, maxLength: number): string {
 }
 
 export function cleanPacketString(str: string): string {
-    return str.replace(/\0/g, '');
+    const idx = str.indexOf('\0');
+    return idx === -1 ? str : str.slice(0, idx);
 }
 
 //sample rates
