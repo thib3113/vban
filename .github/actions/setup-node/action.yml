@@ -27,7 +27,7 @@ runs:
         npm --version
 
     - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v6
       with:
         # We run install manually to respect the working-directory
         run_install: false
