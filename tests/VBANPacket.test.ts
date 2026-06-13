@@ -79,7 +79,7 @@ describe('VBANPacket', () => {
 
         it('should throw an error for an invalid packet identification', () => {
             const headerBuffer = createTestHeaderBuffer(defaultHeaderProps);
-            headerBuffer.write('XXXX', 0, 'ascii'); // Corrupt the identifier
+            headerBuffer.write('FAIL', 0, 'ascii'); // Corrupt the identifier
             expect(() => VBANPacket.parsePacketHeader(headerBuffer)).toThrow('Invalid Header');
         });
 
