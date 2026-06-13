@@ -45,7 +45,7 @@
     "prettier": "3.8.1",
     "rimraf": "6.1.3",
     "tinybench": "^6.0.0",
-    "ts-jest": "29.4.6",
+    "ts-jest": "29.4.11",
     "ts-node": "10.9.2",
     "typedoc": "0.28.17",
     "typescript": "5.9.3",
