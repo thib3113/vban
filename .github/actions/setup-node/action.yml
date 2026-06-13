@@ -40,7 +40,7 @@ runs:
         echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
     - name: Setup pnpm cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
         # Correctly hash the lock file inside the specified working directory
