@@ -81,6 +81,6 @@ jobs:
         with:
           name: eslint-coverage
           path: ./coverage/
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         with:
           fail_ci_if_error: false # optional (default = false)
