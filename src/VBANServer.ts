@@ -32,6 +32,31 @@ export declare interface VBANServer {
     emit<U extends keyof VBANServerEvents>(event: U, ...args: Parameters<VBANServerEvents[U]>): boolean;
 }
 
+
+const DEFAULT_APP: Omit<IPacketPingData, 'hostname'> = {
+    applicationName: 'Test application',
+    manufacturerName: 'Anonymous',
+    applicationType: EServicePINGApplicationType.SERVER,
+    features: [EServicePINGFeatures.AUDIO, EServicePINGFeatures.MIDI, EServicePINGFeatures.TXT, EServicePINGFeatures.SERIAL],
+    bitFeatureEx: 0,
+    PreferredRate: 0,
+    minRate: 6000,
+    maxRate: 705600,
+    color: { blue: 0, green: 128, red: 128 },
+    nVersion: 12345,
+    GPSPosition: '',
+    userPosition: '',
+    langCode: 'fr-fr',
+    reservedASCII: '',
+    reservedEx: '',
+    reservedEx2: '',
+    deviceName: 'NodeJs Server',
+    userName: '',
+    userComment: ''
+};
+
+let cachedHostname: string | undefined;
+
 export class VBANServer extends EventEmitter {
     public readonly UDPServer: Socket;
     private readonly options: IVBANServerOptions;
@@ -101,28 +126,7 @@ export class VBANServer extends EventEmitter {
     public sendPing(receiver: { address: string; port: number }, isReply = false): Promise<void> {
         const frameCounter = this.getFrameCounter(ESubProtocol.SERVICE);
 
-        const defaultApp: Omit<IPacketPingData, 'hostname'> = {
-            applicationName: 'Test application',
-            manufacturerName: 'Anonymous',
-            applicationType: EServicePINGApplicationType.SERVER,
-            features: [EServicePINGFeatures.AUDIO, EServicePINGFeatures.MIDI, EServicePINGFeatures.TXT, EServicePINGFeatures.SERIAL],
-            bitFeatureEx: 0,
-            PreferredRate: 0,
-            minRate: 6000,
-            maxRate: 705600,
-            color: { blue: 0, green: 128, red: 128 },
-            nVersion: 12345,
-            GPSPosition: '',
-            userPosition: '',
-            langCode: 'fr-fr',
-            reservedASCII: '',
-            reservedEx: '',
-            reservedEx2: '',
-            deviceName: 'NodeJs Server',
-            userName: '',
-            userComment: ''
-        };
-        const application = Object.assign(defaultApp, this.options.application);
+        const application = { ...DEFAULT_APP, ...this.options.application };
 
         const answerPacket = new VBANPingPacket(
             {
@@ -150,7 +154,7 @@ export class VBANServer extends EventEmitter {
                 reservedEx: application.reservedEx,
                 reservedEx2: application.reservedEx2,
                 deviceName: application.deviceName,
-                hostname: application.hostname ?? os.hostname(),
+                hostname: application.hostname ?? (cachedHostname ??= os.hostname()),
                 userName: application.userName,
                 userComment: application.userComment
             }
