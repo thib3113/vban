@@ -126,7 +126,7 @@ export class VBANServer extends EventEmitter {
     public sendPing(receiver: { address: string; port: number }, isReply = false): Promise<void> {
         const frameCounter = this.getFrameCounter(ESubProtocol.SERVICE);
 
-        const application = Object.assign({}, DEFAULT_APP, this.options.application);
+        const application = { ...DEFAULT_APP, ...this.options.application };
 
         const answerPacket = new VBANPingPacket(
             {
