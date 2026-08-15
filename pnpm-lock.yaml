@@ -36,8 +36,8 @@ importers:
         specifier: 8.56.1
         version: 8.56.1(eslint@10.0.3)(typescript@5.9.3)
       dotenv:
-        specifier: 17.3.1
-        version: 17.3.1
+        specifier: 17.4.2
+        version: 17.4.2
       esbuild:
         specifier: 0.28.1
         version: 0.28.1
@@ -1084,8 +1084,8 @@ packages:
     resolution: {integrity: sha512-X07nttJQkwkfKfvTPG/KSnE2OMdcUCao6+eXF3wmnIQRn2aPAHH3VxDbDOdegkd6JbPsXqShpvEOHfAT+nCNwQ==}
     engines: {node: '>=0.3.1'}
 
-  dotenv@17.3.1:
-    resolution: {integrity: sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==}
+  dotenv@17.4.2:
+    resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
 
   eastasianwidth@0.2.0:
@@ -3173,7 +3173,7 @@ snapshots:
 
   diff@4.0.4: {}
 
-  dotenv@17.3.1: {}
+  dotenv@17.4.2: {}
 
   eastasianwidth@0.2.0: {}
 
