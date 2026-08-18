@@ -18,8 +18,8 @@ importers:
         specifier: 24.0.0
         version: 24.0.0
       '@tsconfig/node14':
-        specifier: 14.1.8
-        version: 14.1.8
+        specifier: 14.1.9
+        version: 14.1.9
       '@types/debug':
         specifier: 4.1.12
         version: 4.1.12
@@ -644,8 +644,8 @@ packages:
   '@tsconfig/node14@1.0.3':
     resolution: {integrity: sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==}
 
-  '@tsconfig/node14@14.1.8':
-    resolution: {integrity: sha512-SjGT+qPvh8Uhc849yNMD0ZIPr69AyB7Z46nMqhrI3gCVocd6mhI0jP4YE4onO/ufpmengRfTxNMpdpKEp2xRIg==}
+  '@tsconfig/node14@14.1.9':
+    resolution: {integrity: sha512-LJcGO+hCMHqM+ZkqbLrIvhm7aIZDyFUFHDI3xLhrOI+iXHh+BooSlCgK8QevDIOjjuliNNI4/KeZFSRXOCnNKQ==}
 
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
@@ -2739,7 +2739,7 @@ snapshots:
 
   '@tsconfig/node14@1.0.3': {}
 
-  '@tsconfig/node14@14.1.8': {}
+  '@tsconfig/node14@14.1.9': {}
 
   '@tsconfig/node16@1.0.4': {}
 
