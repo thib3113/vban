@@ -35,8 +35,13 @@ export class VBANChatPacket extends VBANServicePacket {
 
     public static toUDPPacket(packet: VBANChatPacket): Buffer {
         // 704 is the size for a service packet
-        const dataBuffer = Buffer.alloc(676);
-        dataBuffer.write(prepareStringForPacket(packet.data, 676), 0, 'utf8');
+        // Use allocUnsafe for performance as the buffer is fully overwritten below.
+        // This avoids zero-filling the memory.
+        const dataBuffer = Buffer.allocUnsafe(676);
+        const written = dataBuffer.write(prepareStringForPacket(packet.data, 676), 0, 'utf8');
+        if (written < 676) {
+            dataBuffer.fill(0, written);
+        }
 
         return this.convertToUDPPacket(
             {
